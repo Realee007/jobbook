@@ -1,7 +1,6 @@
 # Table of contents
 
 * [Introduction](README.md)
-* [Introduction](untitled.md)
 * [C++](c++.md)
 * [Qt](untitled-1.md)
 * [设计模式](she-ji-mo-shi.md)

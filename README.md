@@ -18,5 +18,7 @@ description: 求职笔记
 
 ## Unity3d
 
+## 计算机图形学
 
+## SQL
 

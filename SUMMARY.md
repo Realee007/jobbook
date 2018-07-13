@@ -2,7 +2,7 @@
 
 * [Introduction](README.md)
 * [C++](c++.md)
-* [Qt](untitled-1.md)
+* [Qt](qt.md)
 * [设计模式](she-ji-mo-shi.md)
 * [数据结构](shu-ju-jie-gou.md)
 * [算法](suan-fa.md)

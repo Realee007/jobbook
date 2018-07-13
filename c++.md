@@ -14,9 +14,11 @@
 
 ## C++多态是怎么实现的？
 
-多态\(polymorphism\)是面向对象编程的其中独特概念，
+多态(polymorphism)是面向对象编程的其中独特概念，即为不同类型的实体提供单一的接口。
 
-> polymorphism - providing a single interface to entities of different types. virtual functions provide dynamic \(run-time\) polymorphism through an interface provided by a base class. Overloaded functions and templates provide static \(compile-time\) polymorphism. TC++PL 12.2.6, 13.6.1, D&E 2.9. ---C++ creator Bjarne Stroustrup's glossary 多态，为不同类型的实体提供单一的接口。虚函数通过基类提供的接口提供动态（运行时）多态。重载的函数和模板提供静态（编译时）多态。---C++ 创始者Bjarne Stroustrup的词汇表 \([http://www.stroustrup.com/glossary.html](http://www.stroustrup.com/glossary.html)\):
+> polymorphism - providing a single interface to entities of different types. virtual functions provide dynamic \(run-time\) polymorphism through an interface provided by a base class. Overloaded functions and templates provide static \(compile-time\) polymorphism. TC++PL 12.2.6, 13.6.1, D&E 2.9. ---C++ creator Bjarne Stroustrup's glossary 
+>
+> 多态，为不同类型的实体提供单一的接口。虚函数通过基类提供的接口提供动态（运行时）多态。重载的函数和模板提供静态（编译时）多态。---C++ 创始者Bjarne Stroustrup的词汇表 \([http://www.stroustrup.com/glossary.html](http://www.stroustrup.com/glossary.html)\):
 
 多态：
 
@@ -73,4 +75,47 @@ void f(Base& x){ x+=2;}    //运行时多态
 
 ## 可继承的类的实现需要注意什么问题（构造函数、析构函数）
 
-1. 根据一般规则，凡基类定义有一个(或多个)虚函数，应该要将其析构函数(destructor)声明为`virtual`.因为会根据实际对象的类型选择调用哪一个析构函数，此解析操作应该在运行时进行。
+凡基类定义有一个(或多个)虚函数，应该要将其析构函数(destructor)声明为`virtual`.因为会根据实际对象的类型选择调用哪一个析构函数，此解析操作应该在运行时进行。不然只调用基类的析构函数，没有调用派生类的析构函数，会导致内存泄露 。
+
+`基类的纯虚析构函数一定要予以实现` , 虚析构函数工作的方式是： 最底层的派生类的析构函数最先被调用，然后各个基类的析构函数被调用。这就是说，即使是抽象类，编译器也要产生对基类的析构进行调用，所以要保证为它提供函数体 。
+
+## 指针和引用区别
+
+1. 地址VS别名
+
+   指针通过对地址的操作进而改变实参，引用是以别名的方式对实参的直接处理达到同样效果。
+
+2. NULL初始化VS必须初始化
+
+   指针可以是NULL,而引用肯定会指向一个对象，引用应被初始化。
+
+   ```C++
+   string& rs; // 错误，引用必须被初始化
+   string s("xyzzy");
+   string& rs = s; // 正确，rs指向s
+   
+   指针没有这样的限制。
+   string *ps; // 未初始化的指针，合法但危险
+   ```
+
+3. 效率
+
+   不存在指向空值的引用，这个事实意味着使用引用的代码效率比使用指针的要高。因为在使用引用之前不需要测试它的合法性
+
+```C++
+void printDouble(const double& rd){
+　　　cout << rd; // 不需要测试rd,它肯定指向一个double值
+　　} 　　　 
+```
+
+​	相反，指针则应该总是被测试，防止其为空： 
+
+```C++
+void printDouble(const double *pd)
+　　{
+　　　if (pd)// 检查是否为NULL
+       cout << *pd;
+　　}
+```
+
+4. 指针可以被重新赋值以指向另一个不同的对象，但引用则总是指向在初始化时被指定的对象，以后不能改变。

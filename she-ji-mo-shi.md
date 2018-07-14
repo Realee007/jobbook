@@ -4,31 +4,25 @@
 2. 决定一个对象应该是什么，Facade外观模式描述了怎样用对象表示完整的子系统，FlyWeight享元模式描述了如何支持大量的最小粒度的对象。Abstarct Factory抽象工厂模式和Builder生成器模式产生那些专门负责生成其他对象的对象。Visitor访问者模式和Command命令模式生成的对象专门负责实现对其他对象或者对象组的请求。
 3. 设计模式通过确定接口的主要组成成分及经接口发送的数据类型，来帮助你定义接口。即对一些类的接口做了限制。如，Decorator装饰者模式和Proxy代理模式要求该模式对象的接口与被修饰的对象和受委托的对象一致。
 
-\[toc\]
-
 ## 创建型模式
 
 创建型模式抽象了实例化过程。它帮助一个系统独立于如何创建、组合和表示它的一些对象。一个类创建型模式使用继承改变被实例化的类，而一个对象创建型模型将实例化托给另一个对象。 \[toc\]
 
-### FactoryMethod Pattern
+### 1.FactoryMethod Pattern
 
 > ... the Factory Method pattern uses inheritance and relies on a subclass to handle the desired object instantiation.  
 > ...Factory Method模式使用继承，并依赖于子类来处理所需的对象实例。
 
 假定一个对象在这里调用它自己的工厂方法。因此唯一可能改变的是返回值是一个子类。
 
-\[toc\]
-
-### Abstract Factory Pattern
+### 2. Abstract Factory Pattern
 
 > ... with the Abstract Factory pattern, a class delegates the responsibility of object instantiation to another object via composition ...  
 > ...通过抽象工厂模式，一个类通过合成将对象实例化的责任委托给另一个对象...
 
 这个意思是说有一个对象A想要创建一个Foo对象。它不是自己创建Foo对象（例如，使用工厂方法），而是获取不同的对象（抽象工厂）来创建Foo对象。
 
-\[toc\]
-
-#### differences between Abstract Factory and Factory Method
+### differences between Abstract Factory and Factory Method
 
 **Code Examples**
 
@@ -101,9 +95,7 @@ private:
 };
 ```
 
-\[toc\]
-
-### Singleton
+### 3. Singleton
 
 1.保证一个类只有一个实例；2.能够轻松访问一个类的唯一实例；3.能够控制实例化。
 
@@ -147,8 +139,6 @@ private:
 1. 例如线程A进入函数`instance`判断语句，这句话之后就挂起了，这时线程A已经认为`ins`为`NULL`，但是线程A还没创建singleton对象. 2. 又有一个线程B进入函数`instance`判断语句,因为此时A还没有创建对象，此时B同样认为`ins`变量为NULL,于是线程B继续执行，创建了一个新的singleton对象。 3. 稍后，线程A接着执行，于是也创建了一个新的singleton对象 4. 于是出现两个对象
 
 所以传统的singleton不是线程安全的，要对待实例化的`ins`变量加上互斥锁。
-
-\[toc\]
 
 #### Double-Checked Locking Pattern
 

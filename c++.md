@@ -133,20 +133,24 @@ void printDouble(const double *pd）
 2. 在classes内部，修饰static和non-static成员变量。
 
 ### 2. 作用
-      1. 对比宏（marco）
-      1. 编译器可以对const常量进行类型安全检查，而宏常量不行。
-      2. 避免不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝，而#define定义的常量是立即数,在内存中有若干个拷贝.
-      2. 指针使用const
-      1. const char* p = greeting; char* const p = greeting;
-      2. STL迭代器的作用就像个`T*`指针，`coanst_iterator`作为为`const T*`.
-      3. 函数使用const
-      1. 形参一般使用const 引用类型，可以增加效率，减少不必要的拷贝构造
-      2. 类函数使用const，变成常成员函数，例如`int getVal() const;`不能调用类中任何非const成员函数。
-      4. 类相关
-      1. 类成员变量使用const，只能在初始化列表中赋值
-      2. const修饰的类对象，其中的任何成员都不能被修改，所以该对象只能调用const成员函数。
-      5. 将const类型转化为非const类型
-          采用`const_cast<type_id>(expression)`
+#### 1. 对比宏（marco）
+     	1. 编译器可以对const常量进行类型安全检查，而宏常量不行。
+     	2. 避免不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝，而#define定义的常量是立即数,在内存中有若干个拷贝.
+
+#### 2. 指针使用const
+    1. const char* p = greeting; char* const p = greeting;
+    2. STL迭代器的作用就像个`T*`指针，`coanst_iterator`作为为`const T*`.
+
+#### 3. 函数使用const
+    1. 形参一般使用const 引用类型，可以增加效率，减少不必要的拷贝构造
+    2. 类函数使用const，变成常成员函数，例如`int getVal() const;`不能调用类中任何非const成员函数。
+
+#### 4. 类相关
+    1. 类成员变量使用const，只能在初始化列表中赋值
+    2. const修饰的类对象，其中的任何成员都不能被修改，所以该对象只能调用const成员函数。
+
+#### 5. 将const类型转化为非const类型
+​      采用`const_cast<type_id>(expression)`
 
 ## RAII：“资源获取即初始化”
 ​	RAII是resource acquisition is initialization的缩写，意为“资源获取即初始化”。其核心是**把资源和对象的生命周期绑定，对象创建获取资源，对象销毁释放资源**。在RAII的指导下，C++把底层的资源管理问题提升到了对象生命周期管理的更高层次。 
@@ -169,9 +173,9 @@ void printDouble(const double *pd）
 
 ### 拷贝构造函数的参数类型为什么必须是引用
 
-如果拷贝构造函数中的参数不是一个引用，即形如MyClass(const MyClass myclass)，那么就相当于采用了传值的方式(pass-by-value)，而传值的方式会调用该类的拷贝构造函数，**从而造成无穷递归地调用拷贝构造函数**。因此拷贝构造函数的参数必须是一个引用。 
+​	如果拷贝构造函数中的参数不是一个引用，即形如MyClass(const MyClass myclass)，那么就相当于采用了传值的方式(pass-by-value)，而传值的方式会调用该类的拷贝构造函数，**从而造成无穷递归地调用拷贝构造函数**。因此拷贝构造函数的参数必须是一个引用。 
 
-如果是指针，可以编译运行。但是此时这个函数已经不是一个拷贝构造函数了，而是一个单参数构造函数，编译器会自己生成一个默认拷贝构造函数
+​	如果是指针，可以编译运行。但是此时这个函数已经不是一个拷贝构造函数了，而是一个单参数构造函数，编译器会自己生成一个默认拷贝构造函数
 
 ### 深拷贝和浅拷贝
 
@@ -179,17 +183,11 @@ void printDouble(const double *pd）
 
 **深拷贝**：当B被分配给存储区中的值时，A指向的值被复制到B指向的存储区域中。A和B的数据内容是分开独立的。
 
-
-
 ![deep](https://github.com/Realee007/jobbook/blob/master/src/image/deep%20copy.png?raw=true)
 
-**浅拷贝**：
-
-当B被分配给A时，两个变量指向的是相同的区域，它们共享数据内容。
+**浅拷贝**：当B被分配给A时，两个变量指向的是相同的区域，它们共享数据内容。
 
 ![shallow](https://github.com/Realee007/jobbook/blob/master/src/image/shallow%20copy.png?raw=true)
-
-
 
 
 

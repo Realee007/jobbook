@@ -134,20 +134,20 @@ void printDouble(const double *pd）
 
 ### 2. 作用
 #### 1. 对比宏（marco）
-     	1. 编译器可以对const常量进行类型安全检查，而宏常量不行。
-     	2. 避免不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝，而#define定义的常量是立即数,在内存中有若干个拷贝.
+1. 编译器可以对const常量进行类型安全检查，而宏常量不行。
+2. 避免不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝，而#define定义的常量是立即数,在内存中有若干个拷贝.
 
 #### 2. 指针使用const
-    1. const char* p = greeting; char* const p = greeting;
-    2. STL迭代器的作用就像个`T*`指针，`coanst_iterator`作为为`const T*`.
+1. const char* p = greeting; char* const p = greeting;
+2. STL迭代器的作用就像个`T*`指针，`coanst_iterator`作为为`const T*`.
 
 #### 3. 函数使用const
-    1. 形参一般使用const 引用类型，可以增加效率，减少不必要的拷贝构造
-    2. 类函数使用const，变成常成员函数，例如`int getVal() const;`不能调用类中任何非const成员函数。
+1. 形参一般使用const 引用类型，可以增加效率，减少不必要的拷贝构造
+2. 类函数使用const，变成常成员函数，例如`int getVal() const;`不能调用类中任何非const成员函数。
 
 #### 4. 类相关
-    1. 类成员变量使用const，只能在初始化列表中赋值
-    2. const修饰的类对象，其中的任何成员都不能被修改，所以该对象只能调用const成员函数。
+1. 类成员变量使用const，只能在初始化列表中赋值
+2. const修饰的类对象，其中的任何成员都不能被修改，所以该对象只能调用const成员函数。
 
 #### 5. 将const类型转化为非const类型
 ​      采用`const_cast<type_id>(expression)`

@@ -181,13 +181,13 @@ void printDouble(const double *pd）
 
 
 
-![TIM截图20180714164625](E:\桌面\TIM截图20180714164625.png)
+![deep](https://github.com/Realee007/jobbook/blob/master/src/image/deep%20copy.png?raw=true)
 
 **浅拷贝**：
 
 当B被分配给A时，两个变量指向的是相同的区域，它们共享数据内容。
 
-![TIM截图20180714164618](E:\桌面\TIM截图20180714164618.png)
+![shallow](https://github.com/Realee007/jobbook/blob/master/src/image/shallow%20copy.png?raw=true)
 
 
 

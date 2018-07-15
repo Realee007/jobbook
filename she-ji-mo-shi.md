@@ -242,3 +242,8 @@ instance->transmute();
 
 [参考单例模式，与多线程](https://www.cnblogs.com/liyuan989/p/4264889.html/)
 
+
+
+## 观察者模式与MVC
+
+https://blog.csdn.net/lengxiao1993/article/details/55511101

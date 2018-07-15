@@ -199,7 +199,7 @@ void printDouble(const double *pd）
 
 ## placement new操作符 
 placement new 是重载operator new 的版本,首先了解new操作符
-#### new
+### new
 ```
 class MyClass {…};
 MyClass * p=new MyClass;
@@ -208,8 +208,11 @@ MyClass * p=new MyClass;
 1. 调用operator new分配内存；
 2. 调用构造函数生成类对象；
 3. 返回相应指针。
+#### new 和 malloc区别
 
-#### placement new
+   
+
+### placement new
 如果你想在已经分配的内存中创建一个对象，使用new是不行的。 而placement new可以。它的原型如下
 ```c++
 void* operator new(std::size_t, void* pMemory) throw();	//placement new
@@ -345,6 +348,10 @@ const void** __vfptr = &__fun[0];
 
    这部分详细参考了：[C++中的虚函数(表)实现机制以及用C语言对其进行的模拟实现](https://blog.twofei.com/496/)
 
+### 纯虚析构函数是一定要函数体的
+
+​	纯虚析构函数需要提供函数的实现，而一般纯虚函数不能有实现，原因在于，纯虚析构函数最终需要被调用，以析构基类对象，虽然是抽象类没有实体。而如果不提供该析构函数的实现，将使得在析构过程中，析构无法完成而导致析构异常的问题。 
+
 ## sizeof
 
 ### sizeof（空类或者结构体）
@@ -409,3 +416,9 @@ struct MyStruct2
 此sizeof(MyStruct2) = 24 
 
 原因:1+7(对齐)+8+4+4(满足结构体的字节边界数)=24 
+
+## 动态内存和静态内存
+
+
+
+## 左值和右值的区别

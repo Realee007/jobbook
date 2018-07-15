@@ -252,7 +252,10 @@ https://blog.csdn.net/l773575310/article/details/71601460(unity3d 飞机子弹�
 虚函数具体分为2个步骤：
 
 1. 每个class产生出一堆指向virtual functions的指针，放在一个称为virtual table（**vtbl**）表格中。
+
 2. 每个class object被安插一个指针，指向相关的virtual table.通常这个指针被称为**vptr**.
+
+### 拥有多个虚函数的类对象
 
 ```c++
 class Base1
@@ -261,15 +264,148 @@ class Base1
     	int base1_1;
     	int base1_1;
     virtual void base1_fun1(){}
-    virtual void base1_fun1(){}
+    virtual void base1_fun2(){}
 }
 ```
-
 Base1的内存分布情况：
+| sizeof(Base1)     | 12   |
+| ----------------- | ---- |
+| offsetof(__vfptr) | 0    |
+| offsetof(base1_1) | 4    |
+| offsetof(base1_2) | 8    |
 
-| sizeof() |      |
-| -------- | ---- |
-|          |      |
-|          |      |
-|          |      |
+(Debug模式下, 未初始化的变量值为`0xCCCCCCCC`, 即:`-858983460`) 
 
+![__vfptr_2virtual.png](https://github.com/Realee007/jobbook/blob/master/src/image/__vfptr_2virtual.png?raw=true) 
+
+base1_1前面多了一个变量__vfptr(虚函数表vtable指针)，其类型为`void**`,即一个指向`void*` 数组.
+再看[0]元素，类型为`void*`其值为 ConsoleApplication2.exe!Base1::base1_fun1(void) ，这其实指的是Base1::base1_fun1() 函数的地址。
+可得, __vfptr的定义伪代码大概如下: 
+
+```c++;
+void* __fun[2]={&Base1::base1_fun1,&Base1::base1_fun2}
+const void** __vfptr = &__fun[0];
+```
+
+通过上面图表, 我们可以得到如下结论:
+1. 更加肯定前面我们所描述的: __vfptr只是一个指针, 她指向一个函数指针数组(即: 虚函数表)
+2. 增加一个虚函数, 只是简单地向该类对应的虚函数表中增加一项而已, 并不会影响到类对象的大小以及布局情况
+
+   不妨, 我们再定义一个类的变量b2, 现在再来看看__vfptr的指向: 
+
+   ![__vfptr_2virtual_2obj.png](https://github.com/Realee007/jobbook/blob/master/src/image/__vfptr_2virtual_2obj.png?raw=true) 
+
+通过Watch 1窗口我们看到:
+1. b1和b2是类的两个变量, 理所当然, 它们的地址是不同的(见 &b1 和 &b2)
+2. 虽然b1和b2是类的两个变量, 但是: 她们的__vfptr的指向却是同一个虚函数表
+
+由此可以总结：
+同一个类的不同实例共用同一份虚函数表, 她们都通过一个所谓的虚函数表指针__vfptr(定义为void**类型)指向该虚函数表. 
+于是类对象的内存布局情况如下：
+
+![class-virtual-1.png](https://github.com/Realee007/jobbook/blob/master/src/image/class-virtual-1.png?raw=true) 
+
+虚函数表和类对象的关系：
+1. 它是编译器在**编译时期**为我们创建好的, 只存在一份。
+2. 定义类对象时, 编译器自动将类对象的__vfptr指向这个虚函数表。
+
+### 子类覆盖基类虚函数
+
+   ```c++
+   class Base1
+   {
+   public:
+       int base1_1;
+       int base1_2;
+   
+       virtual void base1_fun1() {}
+       virtual void base1_fun2() {}
+   };
+   
+   class Derive1 : public Base1
+   {
+   public:
+       int derive1_1;
+       int derive1_2;
+   
+       // 覆盖基类函数
+       virtual void base1_fun1() {}
+   };
+   ```
+
+   ![subclassoverridevirtual.png](https://github.com/Realee007/jobbook/blob/master/src/image/subclassoverridevirtual.png?raw=true) 
+
+   原本是Base1::base1_fun1(), 但由于**继承类重写**了基类Base1的此方法, 所以现在变成了Derive1::base1_fun1()!
+
+   那么, 无论是通过Derive1的指针还是Base1的指针来调用此方法, 调用的都将是被继承类重写后的那个方法(函数), 多态发生鸟!!!
+
+   那么新的布局图: 
+
+   ![subclassoverride.png](https://github.com/Realee007/jobbook/blob/master/src/image/subclassoverride.png?raw=true) 
+
+   这部分详细参考了：[C++中的虚函数(表)实现机制以及用C语言对其进行的模拟实现](https://blog.twofei.com/496/)
+
+## sizeof
+
+### sizeof（空类或者结构体）
+
+如下一个类（或结构体），求 `sizeof(Test)` 的值是多少。 
+
+```c++
+class Test
+{  
+};
+```
+
+测试一下的话，会发现它的大小是**1**字节,而不是0字节。
+
+> ```
+> To ensure that the addresses of two different objects will be different. For the same reason, "new" always returns pointers to distinct objects.
+> 原因有两个：1) 保证两个不同的对象实例的地址不同；2) new 运算符总是返回两个不同的对象--- Bjarne Stroustrup 
+> ```
+
+```c++
+class Derived : public Test
+{
+};
+
+class Derived2 : public Test
+{
+    char c;
+};
+```
+
+这 3 个类的大小都是 **1** 个字节， 
+
+### sizeof(非空struct)
+
+如下：
+
+```c++
+struct MyStruct
+{
+  double dda1;
+  char dda;
+  int type;
+};
+```
+
+对于32位操作系统：
+
+1. `sizeof(double)`为8个字节，double放在首位，其起始地址跟结构体的起始地址一致为0，并且0为double(8)的倍数(0为任何数的倍数)。
+2. `sizeof(char)`为1个字节，其分配的起始地址相对于结构体的起始地址为8，并且8为char（1）的倍数；
+3. `sizeof(int)`为4个字节，其分配的起始地址相对于结构体为9，然而9不是int(4)的倍数，**为了满足对齐方式对偏移量的约束**，这里会自动填充3个字节。则该起始地址相对于结构体为9+3=12；
+4. 结构体结束的起始地址为16.且16满足**结构体字节边界数**的要求（即是结构体中占用最大空间类型所占字节数的倍数此时为8(double类型)）。所以**sizeof(Mystruct) = 16**.
+
+```c++
+struct MyStruct2
+{
+  char dda;
+  double dda1;
+  int type;
+}；
+```
+
+此sizeof(MyStruct2) = 24 
+
+原因:1+7(对齐)+8+4+4(满足结构体的字节边界数)=24 

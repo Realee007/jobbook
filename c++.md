@@ -169,7 +169,7 @@ void printDouble(const double *pd）
 
 　　2. 一个对象作为函数返回值，以**值传递**的方式从函数返回；
 
-　　3. 一个对象用于给另外一个对象进行**初始化**（常称为**复制初始化**）；
+　　3. 一个对象用于给另外一个对象进行**初始化**（常称为**拷贝初始化**）；`MyClass B; MyClass A = B;`
 
 ### 拷贝构造函数的参数类型为什么必须是引用
 
@@ -198,6 +198,78 @@ void printDouble(const double *pd）
 **这里有个简单的规则：** 如果你需要**定义一个非空的析构函数** 或者当为**深拷贝**的时候。那么，这种情况下你也需要定义一个拷贝构造函数。
 
 ## placement new操作符 
+placement new 是重载operator new 的版本,首先了解new操作符
+#### new
+```
+class MyClass {…};
+MyClass * p=new MyClass;
+```
+这里的new实际上是执行如下3个过程：
+1. 调用operator new分配内存；
+2. 调用构造函数生成类对象；
+3. 返回相应指针。
 
-placement new 是重载operator new 的一个标准、全局的版本，它不能被自定义的版本替代（不像普通的operator new 和operator delete能够被替换为用户自定义版本）
+#### placement new
+如果你想在已经分配的内存中创建一个对象，使用new是不行的。 而placement new可以。它的原型如下
+```c++
+void* operator new(std::size_t, void* pMemory) throw();	//placement new
+```
+placement new 有一个参数：“接收一个指针指向对象该被构造之处”，即允许你在一个已经分配好的内存中（栈或堆中）构造一个新的对象。 
+```c++
+char *buf  = new char[sizeof(string)]; // pre-allocated buffer
+string *p = new (buf) string("hi");    // placement new
+string *q = new string("hi");          // ordinary heap allocation
+```
+​	使用new操作符分配内存需要在堆中查找足够大的剩余空间，这个操作速度是很慢的，而且有可能出现无法分配内存的异常（空间不够）。placement new就可以解决这个问题。我们构造对象都是在一个预先准备好了的内存缓冲区中进行，不需要查找内存，内存分配的时间是常数；而且不会出现在程序运行中途出现内存不足的异常。 
+
+## 对象池
+
+对象池用来通常用来避免重复的内存分配和销毁及内存碎片的产生.
+
+适用的情况如下：
+
+1. 当你需要频繁地创建和销毁对象时
+2. 对象的大小类似
+3. 堆内存的分配有可能造成内存碎片时
+4. 每个对象有封装一些自己的资源类似数据库或网络连接，很难获取及复用
+
+https://blog.csdn.net/l773575310/article/details/71601460(unity3d 飞机子弹模型)
+
+## c/c++中各种变量的位置 
+
+以Unix ELF(Executalbe and Linkable Format)格式文件为例说明编译器是怎么安排全局变量，静态变量和自动变量的位置的。 
+
+1. 全局变量：已初始化的保存在.data段中，未初始化的表示为.bss段的一个占字符。
+2. 静态变量：同全局变量.
+3. 非静态局部变量：在运行时保存在栈中。既不在.data段也不再.bss段
+
+
+
+## C++虚函数的实现 
+
+通过在基类中声明虚函数，可以让我们定义一个基类的指针，其指向一个继承类，当通过基类的指针去调用函数时，可以在运行时决定该调用是基类函数还是继承类函数。虚函数是实现多态（动态绑定）/接口函数的基础。
+
+虚函数具体分为2个步骤：
+
+1. 每个class产生出一堆指向virtual functions的指针，放在一个称为virtual table（**vtbl**）表格中。
+2. 每个class object被安插一个指针，指向相关的virtual table.通常这个指针被称为**vptr**.
+
+```c++
+class Base1
+{
+    public:
+    	int base1_1;
+    	int base1_1;
+    virtual void base1_fun1(){}
+    virtual void base1_fun1(){}
+}
+```
+
+Base1的内存分布情况：
+
+| sizeof() |      |
+| -------- | ---- |
+|          |      |
+|          |      |
+|          |      |
 

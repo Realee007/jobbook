@@ -509,3 +509,15 @@ int a;
 int &&r1 = c;             # 编译失败
 int &&r2 = std::move(a);  # 编译通过
 ```
+## 模板
+
+模板（template）是为了可以去重用代码(reuse source code)。
+
+这里需要提4个名词：
+
+1. 函数模板(function template)
+2. 模板函数(template function)
+3. 类模板(class template)
+4. 模板类(template class)
+
+**函数模板的声明和模板函数的生成**

@@ -509,9 +509,12 @@ int a;
 int &&r1 = c;             # 编译失败
 int &&r2 = std::move(a);  # 编译通过
 ```
-## 模板
+## 模板（template）
 
-模板（template）是为了可以去重用代码(reuse source code)。
+### 模板的优势
+
+1. 模板是为了重用代码(reuse source code)。特别是程序库开发人员，标准库大量采用了模板技术 。
+2. TMP(Template metaprogramming) 模板元编程，可将工作从运行期转移到编译器，因而可以实现早起侦错和运行时更高效。
 
 这里需要提4个名词：
 
@@ -520,4 +523,48 @@ int &&r2 = std::move(a);  # 编译通过
 3. 类模板(class template)
 4. 模板类(template class)
 
-**函数模板的声明和模板函数的生成**
+**函数模板的声明和模板函数的生成**，函数模板实例化生成模板函数 ,对于模板函数常见的有sort function.
+
+而类模板的声明和模板类的实现，对于模板类常见的有容器类如stack、list等
+
+
+
+### 模板的缺点
+
+1. 模板是一种编译期间生成代码的行为，将工作从运行期转移到编译器，所以编译时间会变长。
+
+   ```c++
+   template<unsigned n>			//一般情况：Factorial<n>的值是
+   struct Factorial {				//n乘以Factorial<n-1>的值.
+       enum {
+           value = n * Factorial<n-1>::value
+       };
+   };
+   
+   template<>						//特殊情况:
+   struct Factorial<0> {			 //Factorial<0>的值是1	.
+       enum {
+           value = 1
+       };
+   };
+   ```
+
+   ```
+   int main() {
+       std::cout << Factorial<5>::value;			//打印120
+       std::cout << Factorial<10>::value;			//打印3628800
+   }
+   ```
+
+   普通的程序的阶乘运算发生在运行阶段，而这个程序的阶乘运算发生在编译阶段！ 
+
+2. 模板一旦出错想确定错误位置和错误原因，都是比较复杂的.
+
+3. 语法不够直观，可读性略弱。
+
+
+
+## C++11的基本特性
+
+### 智能指针
+

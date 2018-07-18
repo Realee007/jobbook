@@ -135,13 +135,9 @@ p[3] = ... <---突然使用没有指向内存区域的指针
 
 自动变量的指针在初期状态，值是不稳定的
 
-
-
 ### 在表达式中:
 
 数组可以被解读成指向其初始元素的指针。
-
-即如下
 
 ```
 int* p;
@@ -394,34 +390,25 @@ const void** __vfptr = &__fun[0];
 如下一个类（或结构体），求 `sizeof(Test)` 的值是多少。 
 
 ```c++
-class Test
-{  
-};
+class Test{};
 ```
 
 测试一下的话，会发现它的大小是**1**字节,而不是0字节。
 
 > ```
 > To ensure that the addresses of two different objects will be different. For the same reason, "new" always returns pointers to distinct objects.
-> 原因有两个：1) 保证两个不同的对象实例的地址不同；2) new 运算符总是返回两个不同的对象--- Bjarne Stroustrup 
+> 原因有两个：1) 保证两个不同的对象实例的地址不同；2) new 运算符总是返回两个不同的对象
+> --- Bjarne Stroustrup 
 > ```
 
 ```c++
-class Derived : public Test
-{
-};
-
-class Derived2 : public Test
-{
-    char c;
-};
+class Derived : public Test{};
+class Derived2 : public Test{char c;};
 ```
 
 这 3 个类的大小都是 **1** 个字节， 
 
 ### sizeof(非空struct)
-
-如下：
 
 ```c++
 struct MyStruct
@@ -477,7 +464,6 @@ struct MyStruct2
 
    相对的的是，表达式**只代表值**的时候，我们称当前的表达式为**右值**。
 
-   
 
 在形式上区分： 语法上是否能用取地址运算符。
 
@@ -527,8 +513,6 @@ int &&r2 = std::move(a);  # 编译通过
 
 而类模板的声明和模板类的实现，对于模板类常见的有容器类如stack、list等
 
-
-
 ### 模板的缺点
 
 1. 模板是一种编译期间生成代码的行为，将工作从运行期转移到编译器，所以编译时间会变长。
@@ -561,8 +545,6 @@ int &&r2 = std::move(a);  # 编译通过
 2. 模板一旦出错想确定错误位置和错误原因，都是比较复杂的.
 
 3. 语法不够直观，可读性略弱。
-
-
 
 ## C++11的基本特性
 
@@ -720,8 +702,6 @@ int main()
 	return 0;
 }
 ```
-
-
 
 ### Lambda表达式
 

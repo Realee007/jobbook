@@ -164,7 +164,7 @@ array = p;是不可以的。因为此时的指针是一个右值，并且数组�
 2. 在classes内部，修饰static和non-static成员变量。
 
 ### 2. 作用
-#### 1. 对比宏（marco）
+#### 1. 对比宏(marco)
 1. 编译器可以对const常量进行类型安全检查，而宏常量不行。
 2. 避免不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝，而#define定义的常量是立即数,在内存中有若干个拷贝.
 
@@ -273,7 +273,7 @@ string *q = new string("hi");          // ordinary heap allocation
 
 https://blog.csdn.net/l773575310/article/details/71601460(unity3d 飞机子弹模型)
 
-## c/c++中各种变量的位置 
+## C/C++中各种变量的位置 
 
 以Unix ELF(Executalbe and Linkable Format)格式文件为例说明编译器是怎么安排全局变量，静态变量和自动变量的位置的。 
 
@@ -389,7 +389,7 @@ const void** __vfptr = &__fun[0];
 
 ## sizeof
 
-### sizeof（空类或者结构体）
+### sizeof(空类或者结构体)
 
 如下一个类（或结构体），求 `sizeof(Test)` 的值是多少。 
 
@@ -566,5 +566,176 @@ int &&r2 = std::move(a);  # 编译通过
 
 ## C++11的基本特性
 
-### 智能指针
+### auto关键字
 
+在C++11之前，auto关键字是用来指定存储期(即自动存储期auto变量).
+
+在新标准中，它的功能变为**类型推断**。通知编译器去根据初始化代码推断所声明变量的真实类型。一般不能来声明函数的返回值。
+
+### nullptr
+
+减少了使用0表示空指针，被隐式类型转换为整型的危险。
+
+### 基于范围的for循环
+
+C++11扩展了for语句的语法，不关心下标、迭代器位置可以直接遍历容器。
+
+### override和final
+
+override，表示当前函数应当重写基类中的虚函数。
+
+ final，表示派生类不应当重写这个虚函数。  
+
+特例1:
+
+```c++
+class B 
+{
+public:
+   virtual void f(short) {std::cout << "B::f" << std::endl;}
+};
+
+class D : public B
+{
+public:
+   virtual void f(int) {std::cout << "D::f" << std::endl;}
+};
+/*
+B* p = new D();
+int a = 2;
+p->f(a);			//输出 B::f
+*/
+```
+
+特例1中，当你通过基类指针调用子类对象时，实际打印的是`B::f`而不是`D::f`.这里`D::f`是**重载Overload** 而**不是重写Override** .
+
+特例2：
+
+```c++
+class B 
+{
+public:
+   virtual void f(int) const {std::cout << "B::f " << std::endl;}
+};
+
+class D : public B
+{
+public:
+   virtual void f(int) {std::cout << "D::f" << std::endl;}
+};
+/*
+B* p = new D();
+p->f(2);			//输出 B::f
+*/
+```
+
+特例2中,参数相同，但是基类的函数是const的，派生类的函数却不是。 同样`D::f`是重载而不是重写.
+
+以上如果使用`override`关键字，程序会在编译的时候报错：“D1::f”: 包含重写说明符“override”的方法没有重写任何基类方法。
+
+### 强类型枚举
+
+在传统的C++枚举类型存在一些缺陷：
+
+1. 它们会将枚举常量暴露在外层作用域中。
+
+   ```
+    enum class Side{ Right, Left };
+    enum class Thing{ Wrong, Right };
+    //编译会报错，因为Right重定义
+   ```
+
+2. 会被隐式转换为整型。
+
+强类型枚举由关键字**enum class**标识 .修正了以上的缺陷。
+
+### std::function
+
+`std::function`是一个模板类，对C++中各种可调用实体（普通函数、函数指针、Lambada表达式，重载了函数调用的类等）的封装，形成一个新的可调用的std::function对象.最大的用处就是在**实现函数回调**.
+
+`std::function<int(int,int)>`  声明了一个function类型，接收两个int、返回一个int的可调用对象。
+
+```c++
+#include <functional>
+#include <iostream>
+using namespace std;
+
+std::function< int(int,int)> Functional;
+
+// 普通函数
+int add(int a, int b) { return a + b; }
+
+// Lambda表达式
+auto lambda = [](int a,int b)->int{ return a*b; };
+
+// 函数对象类的对象(仿函数):重载括号运算符的类
+class divide
+{
+public:
+	int operator()(int a,int b)
+	{
+		return a/b;
+	}
+};
+
+// 1.类成员函数
+// 2.类静态函数
+class TestClass
+{
+public:
+	int ClassMember(int a,int b) { return a+b; }
+	static int StaticMember(int a,int b) { return a+b; }
+};
+
+int main()
+{
+	// 普通函数
+	Functional = add;
+	int result = Functional(1,2);
+	cout << "普通函数：" << result << endl;
+
+	// Lambda表达式
+	Functional = lambda;
+	result = Functional(1,2);
+	cout << "Lambda表达式：" << result << endl;
+
+	// 仿函数
+	Functional = divide();
+	result = Functional(4,2);
+	cout << "仿函数：" << result << endl;
+
+	// 类成员函数
+	TestClass testObj;
+	//C++11的新特性：占位符std::placeholders,其中_1, _2, _3是未指定的数字对象.
+	//用于function的bind中。 _1用于代替回调函数中的第一个参数， _2用于代替回调函数中的第二个参数，以此类推。
+	Functional = std::bind(&TestClass::ClassMember, testObj, std::placeholders::_1, std::placeholders::_2);
+	result = Functional(1,2);
+	cout << "类成员函数：" << result << endl;
+
+	// 类静态函数
+	Functional = TestClass::StaticMember;
+	result = Functional(1,2);
+	cout << "类静态函数：" << result << endl;
+
+	return 0;
+}
+```
+
+
+
+### Lambda表达式
+
+一个lambda表达式表示一个可调用的代码单元，我们可以将其理解为一个未命名的内联函数。它与函数类似，具有返回类型、参数列表、函数体。和函数不同的是lambda可定义在函数内部。
+
+基本语法如下：  
+
+`[捕获列表](参数列表)-> 返回类型{函数体}`
+
+1. capture list（捕获列表）：lambda所在函数中定义的局部变量的列表（通常为空）.
+2. return type:返回类型；
+3. parameter list: 参数列表;
+4. function body:函数体.
+
+与普通函数不同的是，lambda必须使用尾置返回(trailing return type). 尾置返回类型跟在形参列表后面并以一个->符号开头。表示函数真正的返回类型跟在形参列表之后。
+
+https://www.kancloud.cn/wangshubo1989/new-characteristics/99707

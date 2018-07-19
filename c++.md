@@ -234,7 +234,7 @@ MyClass * p=new MyClass;
 这里的new实际上是执行如下3个过程：
 1. 调用operator new分配内存；
 2. 调用构造函数生成类对象；
-3. 返回相应指针。
+3. 返回该对象的指针。
 #### new 和 malloc区别
 
 1. malloc 函数返回的是 void * 类型。对于C++，如果你写成：p = malloc (sizeof(int)); 则程序无法通过编译，报错：“不能将 void* 赋值给 int * 类型变量”。所以必须通过 (int *) 来将强制转换。而对于C，没有这个要求，但为了使C程序更方便的移植到C++中来，建议养成强制转换的习惯.
@@ -268,16 +268,6 @@ string *q = new string("hi");          // ordinary heap allocation
 4. 每个对象有封装一些自己的资源类似数据库或网络连接，很难获取及复用
 
 https://blog.csdn.net/l773575310/article/details/71601460(unity3d 飞机子弹模型)
-
-## C/C++中各种变量的位置 
-
-以Unix ELF(Executalbe and Linkable Format)格式文件为例说明编译器是怎么安排全局变量，静态变量和自动变量的位置的。 
-
-1. 全局变量：已初始化的保存在.data段中，未初始化的表示为.bss段的一个占字符。
-2. 静态变量：同全局变量.
-3. 非静态局部变量：在运行时保存在栈中。既不在.data段也不再.bss段
-
-
 
 ## C++虚函数的实现 
 
@@ -439,13 +429,29 @@ struct MyStruct2
 
 原因:1+7(对齐)+8+4+4(满足结构体的字节边界数)=24 
 
+## C/C++中各种变量的位置
+
+以Unix ELF(Executalbe and Linkable Format)格式文件为例说明编译器是怎么安排全局变量，静态变量和自动变量的位置的。 
+
+1. 全局变量：已初始化的保存在.data段中，未初始化的表示为.bss段的一个占字符。
+2. 静态变量：同全局变量.
+3. 非静态局部变量：在运行时保存在栈中。既不在.data段也不再.bss段
+
 ## 动态内存分配、静态内存分配和自动内存分配
 
-动态内存分配（Dynamic memory allocation）是在程序运行时才进行分配的。是由malloc或new分配的空间，使用完后需要free或者delete释放掉。也是常说的堆空间(heap)。
+对象由编译器自动创建销毁：
 
-静态内存分配（Static memory allocation）表示在程序启动前变量即分配好，生命周期同程序结束。这个常指全局变量，全局静态变量,和局部静态变量。
+​	静态内存：保存局部static对象、类static数据成语以及定义在任何函数之外的变量。
 
-自动内存分配（Automatic memory allocation）表示在进入一个函数作用域后分配，在离开该作用域后被释放。这个常指函数体内非静态的变量，也是常说的stack内存。
+​	栈内存：保存定义在函数内的非static对象。
+
+对象需显示销毁:
+
+​	堆：保存动态分配的对象。
+
+- 动态内存分配（Dynamic memory allocation）是在程序运行时才进行分配的。是由malloc或new分配的空间，使用完后需要free或者delete释放掉。也是常说的堆空间(heap)。
+- 静态内存分配（Static memory allocation）表示在程序启动前变量即分配好，生命周期同程序结束。这个常指全局变量，全局静态变量,和局部静态变量。
+- 自动内存分配（Automatic memory allocation）表示在进入一个函数作用域后分配，在离开该作用域后被释放。这个常指函数体内非静态的变量，也是常说的stack内存。
 
 ## 左值和右值的区别
 
@@ -531,9 +537,6 @@ int &&r2 = std::move(a);  # 编译通过
            value = 1
        };
    };
-   ```
-
-   ```
    int main() {
        std::cout << Factorial<5>::value;			//打印120
        std::cout << Factorial<10>::value;			//打印3628800
@@ -718,4 +721,166 @@ int main()
 
 与普通函数不同的是，lambda必须使用尾置返回(trailing return type). 尾置返回类型跟在形参列表后面并以一个->符号开头。表示函数真正的返回类型跟在形参列表之后。
 
+可以忽略参数列表和返回类型，但必须存在 捕获列表`[]`和函数体`{}`:`auto f =[] {return 4;}`。
+
 https://www.kancloud.cn/wangshubo1989/new-characteristics/99707
+
+### std::thread
+
+默认构造函数：`thread() noexcept`(在C++11中noexcept说明指定某个函数不会抛出异常)
+
+### initializer_list
+
+和vector一样，initializer_list也是模板类型。
+
+```c++
+class CompareClass 
+{
+  CompareClass (int,int);
+  CompareClass (initializer_list<int>);
+};
+
+int main（）
+{
+    myclass foo {10,20};  // calls initializer_list ctor
+    myclass bar (10,20);  // calls first constructor 
+}
+```
+
+### 智能指针
+
+`#include<memory>`
+
+1. `shared_ptr`允许多个指针指向同一个对象,“共享”。
+2. `unique_ptr`“独占”所指向的对象。
+3. `weak_ptr`弱引用，指向`shared_ptr`的弱引用.将`weak_ptr`绑定到`shared_ptr`不会改变其引用计数 
+
+#### shared_ptr和unique_ptr区别
+
+使用`unique_ptr`某一时刻只能有一个`unique_ptr`指向一个指定对象。当`unique_ptr`被销毁时，它所指的对象也被销毁。虽然不能拷贝或赋值`unique_ptr`但是可以通过realease或reset将指针的所有权从一个(非const)`unique_ptr`转移到另一个:
+
+```
+unique_ptr<T> myPtr(new T);       // Okay
+unique_ptr<T> myOtherPtr = myPtr; // Error: Can't copy unique_ptr
+
+unique_ptr<string> p2(p1.release());//p1.release()返回p1,并将p1置为空
+unique_ptr<string> p3(new string("Text"));
+p2.reset(p3.release());			//p2.reset()释放了p2原来的内存,令p2指向了p3.
+```
+
+使用`shared_ptr`允许多个指针指向同一个对象，当最后一个资源被销毁时，才会被自动释放。
+
+```
+shared_ptr<string> myPtr(new string("shared_ptr")); // Okay
+shared_ptr<string> myOtherPtr1 = myPtr; // Sure!  Now have two pointers to the resource.
+shared_ptr<string> myOtherPtr2 = myPtr; // Sure!  Now have three pointers to the resource.
+```
+
+在内部，`shared_ptr`使用引用计数来跟踪有多少指针引用资源 。但是**这里注意要避免-- 循环引用**
+
+#### 智能指针的循环引用
+
+“循环引用”简单来说就是：两个对象互相使用一个shared_ptr成员变量指向对方的会造成循环引用。导致引用计数失效。下面给段代码来说明循环引用： 
+
+```c++
+class B;
+class A
+{
+public:
+	~A(){cout<<"delete A";}
+	std::shared_ptr <B> m_b;
+};
+class B
+{
+public:
+	~B(){cout << "delete B" }
+	std::shared_ptr <A> m_a;
+};
+int main()
+{
+	std::shared_ptr<A> a(new A); //new出来的A的引用计数此时为1
+	std::shared_ptr<B> b(new B); //new出来的B的引用计数此时为1
+	std::shared_ptr<int> c; //new出来的c的引用计数此时为0
+	if (true)
+	{
+		a->m_b = b; //B的引用计数增加为2
+		b->m_a = a; //A的引用计数增加为2
+		std::shared_ptr<int> myptr(new int(10));
+		c = myptr;					//c的引用计数此时为2
+	}
+	cout <<"a use count"<< a.use_count() << endl;		//a的引用计数此时为2
+	cout <<"b use count" << b.use_count() << endl;		//b的引用计数此时为2
+	cout << "c use count" << c.use_count() << endl;		//c的引用计数此时为1
+	return 0;
+}
+```
+
+ 注意此时a,b都没有释放，产生了内存泄露问题！ 
+
+即A内部有指向B，B内部有指向A，这样对于A，B必定是在A析构后B才析构，对于B，A必定是在B析构后才析构A，这就是循环引用问题，违反常规，导致内存泄露 . 
+
+解决的较佳方法是使用**weak_ptr**打破这种循环引用。
+
+```c++
+class B;
+class A
+{
+public:
+	~A()
+	{
+		cout<<"delete A";
+	}
+	void doSomething()
+	{
+		shared_ptr<B> pb = m_b.lock();	//若m_b.use_count()为0，则返回一个空的shared_ptr.
+										//否则返回一个纸箱m_b的对象的shared_ptr
+		if (pb)
+		{
+			cout << "B use count" << pb.use_count() << endl;
+		}
+	}
+	//std::shared_ptr < B > m_b;
+	weak_ptr<B> m_b;
+};
+class B
+{
+public:
+	~B()
+	{
+		cout << "delete B";
+	}
+//	std::shared_ptr <A> m_a;
+	weak_ptr<A> m_a;
+
+};
+
+int main()
+{
+	std::shared_ptr<A> a(new A); //new出来的A的引用计数此时为1
+	std::shared_ptr<B> b(new B); //new出来的B的引用计数此时为1
+	std::shared_ptr<int> c; //new出来的c的引用计数此时为0
+	if (true)
+	{
+		a->m_b = b; //B的引用计数增加为2
+		b->m_a = a; //A的引用计数增加为2
+		std::shared_ptr<int> myptr(new int(10));
+		c = myptr;					//c的引用计数此时为2
+	}
+	cout <<"a use count"<< a.use_count() << endl;		//a的引用计数此时为2(返回与a共享对象的智能指针数量)
+	cout <<"b use count" << b.use_count() << endl;		//b的引用计数此时为2
+	cout << "c use count" << c.use_count() << endl;		//c的引用计数此时为1
+	cout << "weak_ptr:" << endl;
+	a->doSomething();
+	cout << "B use count" << a.use_count() << endl;		//a的引用计数此时为1
+	cout << "B use count" << b.use_count() << endl;		//b的引用计数此时为1
+	return 0;
+}
+```
+
+`weak_ptr`有两个常用的功能函数:
+
+1. `w.expired()` 用于检测所管理的对象是否已经释放。
+2. `w.lock()`用于获取所管理对象的强引用指针(`shared_ptr`)
+
+
+

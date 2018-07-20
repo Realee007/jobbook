@@ -1,4 +1,31 @@
+# 关键技术
+
+## 开发技术
+
+### XML读写
+
+
+
+### Zip文件解压缩
+
+Minizip
+
+https://stackoverflow.com/questions/11370908/how-do-i-use-minizip-on-zlib
+
+## 算法
+
+### 扫描线填充算法
+
+### DFS算法
+
+### 贪心算法
+
+
+
+
+
 ## 条例1
+
 **读取.slc文件以及.zip文件**
 
 首先对.slc文件进行校验，  
@@ -164,6 +191,6 @@ PID是非负整数。系统和用户有进程数量的限制。进程结束后�
    1. 取设置Cii的，且通过pi+1和p1,进而逐个扫描判断点集{p2,p3.......pi}。
 
    2. 当pk都包含于Cii，则维护Cii不变，如果存在pk不包含于Cii则，再次修改Cii，且通过pk和pi+1.再依次对点集{p1,p2,......,pi-1}进行逐个扫描。直到满足。
-     算法由两层递归调用，三层循环完成。![mincircle1.png](https://github.com/Realee007/jobbook/blob/master/src/image/mincircle1.png?raw=true) 
+       算法由两层递归调用，三层循环完成。![mincircle1.png](https://github.com/Realee007/jobbook/blob/master/src/image/mincircle1.png?raw=true) 
 
      

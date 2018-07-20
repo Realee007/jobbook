@@ -4,25 +4,25 @@
 2. 决定一个对象应该是什么，Facade外观模式描述了怎样用对象表示完整的子系统，FlyWeight享元模式描述了如何支持大量的最小粒度的对象。Abstarct Factory抽象工厂模式和Builder生成器模式产生那些专门负责生成其他对象的对象。Visitor访问者模式和Command命令模式生成的对象专门负责实现对其他对象或者对象组的请求。
 3. 设计模式通过确定接口的主要组成成分及经接口发送的数据类型，来帮助你定义接口。即对一些类的接口做了限制。如，Decorator装饰者模式和Proxy代理模式要求该模式对象的接口与被修饰的对象和受委托的对象一致。
 
-## 创建型模式
+# 创建型模式
 
 创建型模式抽象了实例化过程。它帮助一个系统独立于如何创建、组合和表示它的一些对象。一个类创建型模式使用继承改变被实例化的类，而一个对象创建型模型将实例化托给另一个对象。 \[toc\]
 
-### 1.FactoryMethod Pattern
+### 1.工厂模式 FactoryMethod Pattern
 
 > ... the Factory Method pattern uses inheritance and relies on a subclass to handle the desired object instantiation.  
 > ...Factory Method模式使用继承，并依赖于子类来处理所需的对象实例。
 
 假定一个对象在这里调用它自己的工厂方法。因此唯一可能改变的是返回值是一个子类。
 
-### 2. Abstract Factory Pattern
+### 2. 抽象工厂 Abstract Factory Pattern
 
 > ... with the Abstract Factory pattern, a class delegates the responsibility of object instantiation to another object via composition ...  
 > ...通过抽象工厂模式，一个类通过合成将对象实例化的责任委托给另一个对象...
 
 这个意思是说有一个对象A想要创建一个Foo对象。它不是自己创建Foo对象（例如，使用工厂方法），而是获取不同的对象（抽象工厂）来创建Foo对象。
 
-### differences between Abstract Factory and Factory Method
+### 工厂模式和抽象工厂的区别 Differences between Abstract Factory and Factory Method
 
 **Code Examples**
 
@@ -95,7 +95,7 @@ private:
 };
 ```
 
-### 3. Singleton
+### 3. 单例模式 Singleton
 
 1.保证一个类只有一个实例；2.能够轻松访问一个类的唯一实例；3.能够控制实例化。
 
@@ -140,7 +140,7 @@ private:
 
 所以传统的singleton不是线程安全的，要对待实例化的`ins`变量加上互斥锁。
 
-#### Double-Checked Locking Pattern
+#### 双重检查加锁优化模式 Double-Checked Locking Pattern
 
 ```text
     static Singleton* instance()
@@ -242,7 +242,42 @@ instance->transmute();
 
 [参考单例模式，与多线程](https://www.cnblogs.com/liyuan989/p/4264889.html/)
 
+# 结构型模式
 
+## 适配器 Adapter 
+
+使用适配器：
+
+1. 想使用一个已经存在的类，而它的接口不符合你的需求。
+2. 想创建一个可以复用的类，该类可以与其他不相关的类或不一定兼容的类协同工作。
+3. (适用于对象Adapter)想使用一些已存在的子类，但是不可能对每一个都进行子类化以进行匹配它们的接口。对象适配器可以适配它的父类接口。
+
+​    一个绘图编辑器，由一个Shape抽象类定义。它可以为每一种图形定义一个Shape的子类：LineShape类对应直线，PolygonShape对应于多边形等。但是对于可是显示和编辑正文的TextShape子类，并且我们现在有一个提供复杂工具类TextView类用于显示和编辑正文。
+
+​    如果我们改变TextView类使它兼容Shape类，为实现一个应用类而破坏工具类，得不偿失。
+
+   于是，我们可以采用：
+
+1. 继承Shape类的**接口**和TextView的**实现**（私继承）。（Adapter模式类版本）
+2. 将TextView实例作为TextShape的组成部分,与Shape的接口进行匹配来实现TextShape.（Adapter模式对象版本）
+
+```c++
+//私继承
+class Adapter :
+	public Target, private CAdaptee
+	{};
+
+//持有对象指针
+private:
+	OAdaptee* m_oa;
+```
+
+1. 私继承让Adapter能重写私基类的虚函数。而对象指针不行。
+2. 私继承让Adapter能使用私基类的非私有成员。而对象指针只能被使用public成员。
+3. 私继承或者说全部类型的继承`CAdaptee`都会使父类和子类耦合，即要在子类的头文件`Adapter.h`中加入`#include "CAdaptee.h"` ；而持有一个对象指针`OAdaptee*`只需加入`class OAdaptee;` 实现解耦。从而最小化文件之间的编译依赖性。 
+4. 如果一个类没有非静态成员变量，没有虚函数，没有虚基类。那么私继承这种类不会占用空间( EBO, empty base optimization);而对象指针需要占用4或者8字节大小的空间 。
+
+# 行为模式
 
 ## 观察者模式与MVC
 

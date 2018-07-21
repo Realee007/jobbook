@@ -727,7 +727,26 @@ https://www.kancloud.cn/wangshubo1989/new-characteristics/99707
 
 ### std::thread
 
-默认构造函数：`thread() noexcept`(在C++11中noexcept说明指定某个函数不会抛出异常)
+1. 默认构造函数：`thread() noexcept`(在C++11中noexcept说明指定某个函数不会抛出异常).
+	作用：创建一个空的`std::thread`执行对象。
+2. 初始化构造函数:
+```c++
+template <class Fn, class Args....>
+explicit thread(Fn&& fn, Args&&... args);
+```
+	作用：创建一个`std::thread`对象，可被`joinable`,新产生的线程会调用`fn`函数，该函数由`args`给出
+3. 拷贝构造函数(deleted) `thread(const thread&) = delete;`
+	意味`std::thread`对象不可拷贝构造。
+4. Move 构造函数 `thread(thread&& x) noexcept`
+	`std::move(x)`，调用成功后x不再是一个`std::thread`对象。
+注意**可被`joinable`的`std::thread`对象必须在他们销毁之前被主线程`join`或者将其设置为`detached`，不然线程对象未被释放掉**
+
+
+
+
+
+
+
 
 ### initializer_list
 

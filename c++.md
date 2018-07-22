@@ -439,7 +439,7 @@ struct MyStruct2
 4. 堆栈
 5. 堆
 
- ![memoryLayoutC](F:\onedrive_Hust\OneDrive - hust.edu.cn\文档\markdown\gitbook\jobbook\src\image\memoryLayoutC.jpg)
+![memoryLayoutC.jpg](https://github.com/Realee007/jobbook/blob/master/src/image/memoryLayoutC.jpg?raw=true) 
 
 1. 全局变量：已初始化的保存在.data段中，未初始化的表示为.bss段的一个占字符。
 2. 静态变量：同全局变量.

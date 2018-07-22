@@ -431,7 +431,15 @@ struct MyStruct2
 
 ## C/C++中各种变量的位置
 
-以Unix ELF(Executalbe and Linkable Format)格式文件为例说明编译器是怎么安排全局变量，静态变量和自动变量的位置的。 
+### Memory Layout of C Programs
+
+1. 文本段
+2. 初始化数据段
+3. 未初始化数据段
+4. 堆栈
+5. 堆
+
+ ![memoryLayoutC](F:\onedrive_Hust\OneDrive - hust.edu.cn\文档\markdown\gitbook\jobbook\src\image\memoryLayoutC.jpg)
 
 1. 全局变量：已初始化的保存在.data段中，未初始化的表示为.bss段的一个占字符。
 2. 静态变量：同全局变量.

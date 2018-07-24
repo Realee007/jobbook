@@ -159,7 +159,7 @@ private:
 ```
 
 对于 `s_ins = new Singleton();`执行这句代码，机器需要做三件事： 1. singleton对象分配空间； 2. 在分配的空间中构造对象； 3. 使`s_ins`指向分配的空间.  
-遗憾的是==编译器并不是严格按照上面的顺序来执行的。可以交换2和3.==
+遗憾的是**编译器并不是严格按照上面的顺序来执行的。可以交换2和3.**
 
 ```text
 Singleton* Singleton::instance()
@@ -230,7 +230,7 @@ Singleton::instance()->metamorphose();
 Singleton::instance()->transmute();
 ```
 
-b
+b**(正确的单例模式调用方式!)**
 
 ```text
 Singleton* const instance =
@@ -238,6 +238,28 @@ Singleton::instance(); // cache instance pointer
 instance->transmogrify();
 instance->metamorphose();
 instance->transmute();
+```
+
+#### C++11单例模式
+
+在新的C++11之后，C++新标准规定：**当一个线程正在初始化一个变量的时候，其他线程必须得等到该初始化完成以后才能访问它**。
+
+```c++
+//The beauty of the Meyers Singleton in C++11
+class MySingleton
+{
+	public:
+	static MySingleton& getInstacne()
+	{
+        static MySingleton instance;
+        return instance;
+	}
+	private:
+	MySingleton()=default;	//要使用该函数的编译器生成版本，因此您不需要写函数体.（C++11）
+	~MySingleton()=default;
+	MySingleton(const MySingleton&) = delete;
+	MySingleton& operator=(const MySingleton&) = delete;//=delete意味着编译器不会为您生成这些构造函数。（C++11）
+}
 ```
 
 [参考单例模式，与多线程](https://www.cnblogs.com/liyuan989/p/4264889.html/)

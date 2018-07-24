@@ -22,8 +22,13 @@
 
 多态：
 
-1. 静态多态（函数重载、模板）。编译器在编译时就会决定执行哪个函数，由于在程序执行之前就解析出应该调用什么函数。这种方式称为静态绑定。
-2. 动态多态（虚函数即动态调度），让基类的pointer或reference得以指向其任何一个派生类的对象。编译器无法知道哪个函数会被调用，在运行时才知道实际调用的具体，这种方式称为动态绑定。
+### 静态多态（函数重载、模板）
+
+编译器在编译时就会决定执行哪个函数，由于在程序执行之前就解析出应该调用什么函数。这种方式称为静态绑定。
+
+### 动态多态（虚函数即动态调度）
+
+让基类的pointer或reference得以指向其任何一个派生类的对象。编译器无法知道哪个函数会被调用，在运行时才知道实际调用的具体，这种方式称为动态绑定。
 
 举例：
 
@@ -226,7 +231,7 @@ array = p;是不可以的。因为此时的指针是一个右值，并且数组�
 
 ## placement new操作符 
 placement new 是重载operator new 的版本,首先了解new操作符
-### new
+### new做了些什么
 ```
 class MyClass {…};
 MyClass * p=new MyClass;
@@ -243,7 +248,7 @@ MyClass * p=new MyClass;
 4. C++允许重载new/delete操作符.
 5. 内存的释放所不同,delete和free
 
-### placement new
+### placement new是new的重载版
 如果你想在已经分配的内存中创建一个对象，使用new是不行的。 而placement new可以。它的原型如下
 ```c++
 void* operator new(std::size_t, void* pMemory) throw();	//placement new
@@ -772,9 +777,11 @@ explicit thread(Fn&& fn, Args&&... args);
 	`std::move(x)`，调用成功后x不再是一个`std::thread`对象。
 注意**可被`joinable`的`std::thread`对象必须在他们销毁之前被主线程`join`或者将其设置为`detached`，不然线程对象未被释放掉**
 
+### 初始化变量的改变（防止线程竞争）
 
+在新的C++11之后，新标准规定：
 
-
+当一个线程正在初始化一个变量的时候，其他线程必须得等到该初始化完成以后才能访问它。
 
 
 
@@ -932,5 +939,64 @@ int main()
 1. `w.expired()` 用于检测所管理的对象是否已经释放。
 2. `w.lock()`用于获取所管理对象的强引用指针(`shared_ptr`)
 
+## STL
 
+STL (标准模版库，Standard Template Library）
+
+六大组件
+
+1. Container(容器) 各种基本数据结构
+2. Adapter(适配器) 可改变containers、Iterators或Function object接口的一种组件
+3. Algorithm(算法) 各种基本算法如sort、search…等
+4. Iterator(迭代器) 连接containers和algorithms
+5. Function object(函数对象) 
+6. Allocator(分配器)  
+
+### vector 
+
+**内部数据结构：数组**。 
+
+随机访问每个元素，所需要的时间为常量。
+
+在末尾增加或删除元素所需时间与元素数目无关，在中间或开头增加或删除元素所需时间随元素数目呈线性变化。 
+
+可动态增加或减少元素，内存管理自动完成，但**程序员可以使用reserve()成员函数来管理内存** 。
+
+vector扩容机制 :是按容量的**2倍进行扩容**，(空间和时间的权衡 ) .
+
+```
+vector <int> array;
+array.push_back(1);
+array.push_back(2);
+array.push_back(3);
+for (vector <int>::size_type i = array.size() - 1; i >= 0; --i) // 反向遍历array数组 
+{
+	cout << array[i] << endl;
+}
+size_type 是 unsigned int型的,也就是说, i=0时再执行--i则i=0xFFFFFFFF(4294967295).于是程序会崩溃.
+```
+
+### list
+
+**内部数据结构：双向环状链表**。
+
+不能随机访问一个元素。 **可双向遍历**。 在开头、末尾和中间**任何地方增加或删除**元素所需**时间都为常量**。
+
+可动态增加或减少元素，内存管理自动完成。 增加任何元素都不会使迭代器失效。删除元素时，除了指向当前被删除元素的迭代器外，其它迭代器都不会失效。 
+
+### deque 
+
+**内部数据结构：数组。** 
+
+ 随机访问每个元素，所需要的时间为常量。 在开头和末尾增加元素所需时间与元素数目无关，在中间增加或删除元素所需时间随元素数目呈线性变化。 可动态增加或减少元素，内存管理自动完成，**不提供用于内存管理的成员函数。** 增加任何元素都将使deque的迭代器失效。在deque的中间删除元素将使迭代器失效。在deque的头或尾删除元素时，只有指向该元素的迭代器失效。 
+
+
+
+
+
+### 迭代器失效、解决办法 
+
+
+
+### map和unorder_map的实现机制（红黑树，哈希表） 
 

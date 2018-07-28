@@ -2,7 +2,13 @@
 
 ## OSI七层模型 
 
+​	数据从应用层发下来，会在每一层都加上头部信息，进行封装，然后再发生到数据接收端。这个基本流程就是数据都会经过数据的封装和解封装过程。 
 
+![data transport from osi 7.png](https://github.com/Realee007/jobbook/blob/master/src/image/data%20transport%20from%20osi%207.png?raw=true) 
+
+在OSI七层模型中，每一层的作用和对应的协议如下: 
+
+![osi seven.png](https://github.com/Realee007/jobbook/blob/master/src/image/osi%20seven.png?raw=true) 
 
 ## TCP 与 UDP简要说明
 

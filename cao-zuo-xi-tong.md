@@ -48,9 +48,7 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
 - 是CPU使用的基本单元。
 - 由线程ID、程序计数器、寄存器集合和栈组成。 
 
-### 区别
 
-https://blog.csdn.net/linraise/article/details/12979473
 
 ## 进程的通信方式---IPC(InterProcess Communication)
 

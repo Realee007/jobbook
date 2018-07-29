@@ -690,9 +690,56 @@ int &&r2 = std::move(a);  # 编译通过
 
 3. 语法不够直观，可读性略弱。
 
+### 模板的实例化
+
+比如一个模板:
+
+```
+template<class T>
+void swap(T& a, T& b)
+{
+    T temp; temp =a; a=b; b=temp;
+}
+```
+
+1. 显式实例化
+
+   `template void swap<int>()` //无需给该函数重新编写函数体，这个只是**声明.**
+
+   作用：提高效率，编译器在编译的过程中会根据显示实例化指定的类型生成模板实例。
+
+2. 隐式实例化
+
+   在使用模板之前，编译器不生成模板的声明和定义实例。只有当使用模板时，编译器才根据模板定义生成相应类型的实例。 
+
+   ```c++
+   int i=0,j=1;
+   swap(i,j);		//编译器会根据参数i,j的类型隐式地生成swap<int>(int& a,int &b)的函数定义
+   ```
+
 ### 模板的具体化
 
-https://blog.csdn.net/chenyiming_1990/article/details/10526371
+**类模板**
+
+```c++
+template <class T> 
+class vector{//…//}; // (a) 普通型
+template class vector<typename> ; // (b) 的显式实例化
+template <class T> 
+class vector<T*>{//…//}; // (c) 对指针类型特化
+template <> class vector <void*>{//…//}; // (d) 对void*进行特化
+```
+
+**函数模板**
+
+```c++
+void swap(int &a, int &b){} // 普通的函数
+template<> swap<int>(int &a, int &b){} // 特化的模板函数
+template void swap<int>(int &a, int &b); // 显式实例化，这个只用声明就行
+template<class T> void swap(T &a, T &b){} // 模板
+```
+
+参考：https://blog.csdn.net/chenyiming_1990/article/details/10526371
 
 ## C++11的基本特性
 
@@ -868,7 +915,7 @@ int main()
 
 可以忽略参数列表和返回类型，但必须存在 捕获列表`[]`和函数体`{}`:`auto f =[] {return 4;}`。
 
-https://www.kancloud.cn/wangshubo1989/new-characteristics/99707
+参考 ：https://www.kancloud.cn/wangshubo1989/new-characteristics/99707
 
 ### std::thread
 
@@ -1177,7 +1224,7 @@ min-heap:每个节点的键值都小于或等于其子节点键值。
 
 平衡二叉搜索树**(AVL树）**：在BST的基础上，要求任何节点的左右子树高度相差最多1。
 
-**RB-tree(红黑树),**在AVL树的基础上:
+**RB-tree(红黑树),**在BST树的基础上:
 
 1. 每个节点非红即黑。
 2. 根节点为黑

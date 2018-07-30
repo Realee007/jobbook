@@ -1,6 +1,8 @@
 # 关键技术
 
-## 
+## 插件化架构
+
+https://blog.csdn.net/qq_21397217/article/details/52396346#%E5%88%86%E5%B1%82%E6%9E%B6%E6%9E%84
 
 ## 算法
 

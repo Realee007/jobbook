@@ -307,9 +307,11 @@ MVC的 View视图嵌套，可以由Composite模式表述，该模式允许你创
 
 组合模式描述了如何使用递归组合，是的用户不必对这些类进行区别。
 
+典型的composite结构如下
 
+![composite-1.jpg](https://github.com/Realee007/jobbook/blob/master/src/image/composite-1.jpg?raw=true) 
 
-
+![composite-2.jpg](https://github.com/Realee007/jobbook/blob/master/src/image/composite-2.jpg?raw=true) 
 
 # 行为模式
 
@@ -372,4 +374,14 @@ MVC的View-Controller关系是Strategy模式的一个例子。一个策略是一
 
 1. 使用一个算法的不同变体。
 2. 减少条件语句，将条件分支移入各自的Strategy类
+
+![Strategy-uml1.jpg](https://github.com/Realee007/jobbook/blob/master/src/image/Strategy-uml1.jpg?raw=true) 
+
+
+
+# 参考
+
+《设计模式》GOF
+
+[《图说设计模式》](http://design-patterns.readthedocs.io/zh_CN/latest/)
 

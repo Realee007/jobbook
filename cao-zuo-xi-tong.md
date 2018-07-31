@@ -30,10 +30,6 @@ int sqr(int x)
 
   参考：https://blog.csdn.net/acs713/article/details/20034511
 
-## 用C++封装线程池
-
-https://blog.csdn.net/gavingreenson/article/details/72770818
-
 
 
 ## 进程和线程的区别
@@ -56,6 +52,7 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
 
 - 是CPU使用的基本单元。
 - 由线程ID、程序计数器、寄存器集合和栈组成。 
+- 它与属于同一进程的其他线程共占代码段、数据段、其他系统资源，独占寄存器和栈。
 
 
 
@@ -127,7 +124,7 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
      3. 无线容量，非阻塞send。
 
 
-   
+
 
 2. 共享内存（shared memory）：共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问，共享内存是**最快的IPC方式**，它往往与其他通信机制，如信号量配合使用，来实现进程间的同步和通信。 
 
@@ -152,6 +149,16 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
       
 
 4. 套接字（socket）：数据通过网络接口（IP地址和端口 ）发送到同一台计算机上的不同进程或网络上的另一台计算机。TCP/UDP。
+
+
+
+## 线程池
+
+线程池是在进程开始时，创建一定数量的线程，并放入到池中以等待工作，当服务器收到请求时会唤醒池中的线程（如果可用的话），并将要处理的请求传递给它。一旦完成了服务，它会返回到池中再等待。如果池中没有可用的线程，那么服务器会一直等待直到有空线程为止。
+
+C++封装线程池
+
+https://blog.csdn.net/gavingreenson/article/details/72770818
 
 
 

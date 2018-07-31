@@ -126,7 +126,6 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
      2. 有限容量，如果队列未满，则非阻塞send，当容量满后，必须阻塞send，直到容量可用。
      3. 无线容量，非阻塞send。
 
-     
 
    
 
@@ -136,19 +135,25 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
 
    
 
-3. 管道（pipe）：管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有血缘关系的进程间使用。进程的血缘关系通常指父子进程关系。
+3. 管道（Pipes）：
 
-   
+   >A *pipe* is a section of shared memory that processes use for communication.  ---[MSDN--pipes](https://docs.microsoft.com/zh-cn/windows/desktop/ipc/pipes)
 
-4. 命名管道（named pipe）：命名管道也是半双工的通信方式，但是它允许无亲缘关系进程间通信。
+   管道是共享内存的一种。创建管道的进程称为pipe server, 与管道连接的进程称为pipe client. 进程A向pipe中写入信息，其他进程从pipe中读取信息。
 
-   
+   1. 匿名管道（anonymous-pipes）:
 
-   
+      匿名，单向管道(单工)，通常建立在父进程和子进程之间的通信，匿名管道总是本地的; 不能用于通过网络进行通信。 
 
-5. 套接字（socket）：数据通过网络接口发送到同一台计算机上的不同进程或网络上的另一台计算机。TCP/UDP。
+   2. 命名管道（named pipes）:
 
-https://blog.csdn.net/wh_sjc/article/details/70283843
+      遵循FIFO ，任何进程都可以充当服务器和客户端，从而可以对等通信（半双工），可用于在同一计算机上的进程之间或跨网络的不同计算机上的进程之间提供通信。
+
+      
+
+4. 套接字（socket）：数据通过网络接口（IP地址和端口 ）发送到同一台计算机上的不同进程或网络上的另一台计算机。TCP/UDP。
+
+
 
 ## 线程间的通信机制 
 

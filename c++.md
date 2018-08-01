@@ -928,18 +928,22 @@ explicit thread(Fn&& fn, Args&&... args);
 ```
 	作用：创建一个`std::thread`对象，可被`joinable`,新产生的线程会调用`fn`函数，该函数由`args`给出
 3. 拷贝构造函数(deleted) `thread(const thread&) = delete;`
-	意味`std::thread`对象不可拷贝构造。
+  意味`std::thread`对象不可拷贝构造。
 4. Move 构造函数 `thread(thread&& x) noexcept`
-	`std::move(x)`，调用成功后x不再是一个`std::thread`对象。
-注意**可被`joinable`的`std::thread`对象必须在他们销毁之前被主线程`join`或者将其设置为`detached`，不然线程对象未被释放掉**
+  `std::move(x)`，调用成功后x不再是一个`std::thread`对象。
+  注意**可被`joinable`的`std::thread`对象必须在他们销毁之前被主线程`join`或者将其设置为`detached`，不然线程对象未被释放掉
+
+### thread_local数据
+
+一个thread_local变量是一个thread的专有对象，其他thread不能访问，除非其拥有者将指向它的指针提供给了其他线程。 普通的局部变量有自己作用域生命期，而thread_local变量只有thread活跃它就活跃。
+
+- 提供thread显示缓存互斥访问数据，避免了数据竞争。
 
 ### 初始化变量的改变（防止线程竞争）
 
 在新的C++11之后，新标准规定：
 
 当一个线程正在初始化一个变量的时候，其他线程必须得等到该初始化完成以后才能访问它。
-
-
 
 
 ### initializer_list

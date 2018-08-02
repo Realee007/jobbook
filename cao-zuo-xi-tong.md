@@ -84,7 +84,7 @@ int sqr(int x)
 
 
 
-## 进程的通信
+## 进程间的通信
 
 进程间的相互协作，来交换数据与信息，通过进程通信:
 
@@ -130,8 +130,6 @@ int sqr(int x)
 
    ​	常见：生产者进程--消费者进程，采用共享内存（缓存）。
 
-   
-
 3. 管道（Pipes）：
 
    >A *pipe* is a section of shared memory that processes use for communication.  ---[MSDN--pipes](https://docs.microsoft.com/zh-cn/windows/desktop/ipc/pipes)
@@ -149,16 +147,6 @@ int sqr(int x)
       
 
 4. 套接字（socket）：数据通过网络接口（IP地址和端口 ）发送到同一台计算机上的不同进程或网络上的另一台计算机。TCP/UDP。
-
-
-
-## 线程池
-
-线程池是在进程开始时，创建一定数量的线程，并放入到池中以等待工作，当服务器收到请求时会唤醒池中的线程（如果可用的话），并将要处理的请求传递给它。一旦完成了服务，它会返回到池中再等待。如果池中没有可用的线程，那么服务器会一直等待直到有空线程为止。
-
-C++封装线程池
-
-https://blog.csdn.net/gavingreenson/article/details/72770818
 
 
 
@@ -200,6 +188,14 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
 实例： 多个thread阻塞在同一个mutex上，系统调度器会选择其中一个接触阻塞状态，而选择的方式有可能造成某个不幸的thread永远也不会解除阻塞进入运行状态。
 
  低优先级进程的饥饿的解决方法之一是**老化（aging）**，即逐渐增加在系统中等待很长时间的进程的优先级。
+
+## 线程池
+
+线程池是在进程开始时，创建一定数量的线程，并放入到池中以等待工作，当服务器收到请求时会唤醒池中的线程（如果可用的话），并将要处理的请求传递给它。一旦完成了服务，它会返回到池中再等待。如果池中没有可用的线程，那么服务器会一直等待直到有空线程为止。
+
+C++封装线程池
+
+https://blog.csdn.net/gavingreenson/article/details/72770818
 
 
 

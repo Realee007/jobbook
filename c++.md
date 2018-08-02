@@ -928,10 +928,10 @@ explicit thread(Fn&& fn, Args&&... args);
 ```
 	作用：创建一个`std::thread`对象，可被`joinable`,新产生的线程会调用`fn`函数，该函数由`args`给出
 3. 拷贝构造函数(deleted) `thread(const thread&) = delete;`
-  意味`std::thread`对象不可拷贝构造。
+    意味`std::thread`对象不可拷贝构造。
 4. Move 构造函数 `thread(thread&& x) noexcept`
-  `std::move(x)`，调用成功后x不再是一个`std::thread`对象。
-  注意**可被`joinable`的`std::thread`对象必须在他们销毁之前被主线程`join`或者将其设置为`detached`，不然线程对象未被释放掉
+    `std::move(x)`，调用成功后x不再是一个`std::thread`对象。
+    注意**可被`joinable`的`std::thread`对象必须在他们销毁之前被主线程`join`或者将其设置为`detached`，不然线程对象未被释放掉
 
 ### thread_local数据
 
@@ -1228,6 +1228,8 @@ min-heap:每个节点的键值都小于或等于其子节点键值。
 
 平衡二叉搜索树**(AVL树）**：在BST的基础上，要求任何节点的左右子树高度相差最多1。
 
+
+
 **RB-tree(红黑树),**在BST树的基础上:
 
 1. 每个节点非红即黑。
@@ -1267,27 +1269,42 @@ map的迭代器介于const和muatble之间，因为元素的key不能被修改�
 
 ### hashtable底层机制
 
-hashetable 插入、查找、删除：O(1)，最坏情况O(N)。 即常数平均时间。
+hashetable 插入、查找、删除：O(1)
 
-如果你采用合适的哈希函数，你可能永远不会看到最坏情况。但是记住这一点是有必要的。 
+只有当采用不合适的哈希函数才会出现最坏情况O(N)。 即常数平均时间。
 
 hashtable是以空间效率来换时间效率的，因而内存消耗肯定要大。
 
-哈希算法存取之所以快,是因为其直接通过关键字key得到要存取的记录内存存储位置 
+哈希算法存取之所以快,是因为其直接通过关键字key得到要存取的记录内存存储位置 。
+
+STL中，hashtable是以开链法，具体是在一个很大的Buckets vecotr（桶向量），vector的每个元素维护一个链表。STL以质数来设计vector，链表的总容量就是桶向量的大小。
+
+插入操作：
+
+1. 待插入的元素key，首先根据（哈希函数计算元素的位置）key值对应vector的长度取余找到在vector上的存储位置，key是否允许重复，表格重组。
+2. 找到key后将对应元素加入到链表中。
+
+删除操作：
+
+1. 根据key根据哈希函数找到位置，并删除对应桶链表节点。
+
+
 
 解决哈希冲突：
 
 1. 线性探测，
 2. 二次探测，
-3. 开链法,
-
-
+3. 开链法。
 
 ### hash_map
 
-与map相比较，它里面的元素不一定是按键值排序的，而是按照所用的hash函数分派的，它能提供更快的搜索速度（当然也跟hash函数有关）。 
 
-hash_map，首先分配一大片内存，形成许多桶。是利用hash函数，对key进行映射到不同区域（桶）进行保存。其插入过程是：
+
+内部结构：hashtable.
+
+与map相比较，它里面的元素不一定是按键值排序的，而是按照所用的hash函数分派的。 
+
+STL中，hashtable是以开链法，具体是在一个较大的Buckets vecotr（桶向量）存对应的key，vector的每个元素维护一个链表，来存具体的value。STL的开链法是以质数来设计表格。是利用hash函数，对key进行映射到不同区域（桶）进行保存。其插入过程是：
 
 1. 得到key
 2. 通过hash函数得到hash值

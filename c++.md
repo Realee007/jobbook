@@ -378,9 +378,12 @@ string *q = new string("hi");          // ordinary heap allocation
 
 虚函数具体分为2个步骤：
 
-1. 每个class产生出一堆指向virtual functions的指针，放在一个称为virtual table（**vtbl**）表格中。
+1. 每个class产生出一堆指向virtual functions的指针，放在一个称为virtual table（**vtbl**）虚函数表中。
+2. 每个class object被安插一个指针，指向相关的virtual table（虚函数表）.通常这个指针被称为**vptr**.
 
-2. 每个class object被安插一个指针，指向相关的virtual table.通常这个指针被称为**vptr**.
+**类的所有对象共享这个类的虚函数表** 
+
+虚函数表是全局共享的元素,即全局仅有一个. 放在全局数据区，编译即确定。 
 
 ### 拥有多个虚函数的类对象
 
@@ -415,7 +418,7 @@ const void** __vfptr = &__fun[0];
 ```
 
 通过上面图表, 我们可以得到如下结论:
-1. 更加肯定前面我们所描述的: __vfptr只是一个指针, 她指向一个函数指针数组(即: 虚函数表)
+1. 更加肯定前面我们所描述的: __vfptr只是一个指针, 她指向一个**函数指针数组**(即: 虚函数表)
 2. 增加一个虚函数, 只是简单地向该类对应的虚函数表中增加一项而已, 并不会影响到类对象的大小以及布局情况
 
    不妨, 我们再定义一个类的变量b2, 现在再来看看__vfptr的指向: 
@@ -427,7 +430,7 @@ const void** __vfptr = &__fun[0];
 2. 虽然b1和b2是类的两个变量, 但是: 她们的__vfptr的指向却是同一个虚函数表
 
 由此可以总结：
-同一个类的不同实例共用同一份虚函数表, 她们都通过一个所谓的虚函数表指针__vfptr(定义为void**类型)指向该虚函数表. 
+**同一个类的不同实例共用同一份虚函数表**, 她们都通过一个所谓的虚函数表指针__vfptr(定义为void**类型)指向该虚函数表. 
 于是类对象的内存布局情况如下：
 
 ![class-virtual-1.png](https://github.com/Realee007/jobbook/blob/master/src/image/class-virtual-1.png?raw=true) 

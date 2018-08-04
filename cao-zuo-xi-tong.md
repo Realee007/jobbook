@@ -298,6 +298,44 @@ signal(semaphore* S)
 
 ![producer-consumer.png](https://github.com/Realee007/jobbook/blob/master/src/image/producer-consumer.png?raw=true) 
 
+
+
+```c++
+#define N 100
+typedef int semaphore;
+semaphore mutex =1;
+semaphore empty =N;
+semapgore full = 0;
+
+void producer()
+{
+    while(true)
+    {
+        int item = produce_item();
+        wait(&empty);
+        wait(&mutex);
+        add_item(item);
+        signal(&mutex);
+        signal(&full);
+    }
+}
+
+void consumer()
+{
+    while(true)
+    {
+        wait(&full);
+        wait(&mutex);
+        int item = remove_item();
+        wait(&mutex);
+        signal(&empty);
+        consume_item(item);
+    }
+}
+```
+
+
+
 ### 哲学家问题
 
 一个哲学家通过`wait()`试图获取相应的筷子，他会通过`signal()`操作释放相应的筷子.
@@ -479,8 +517,6 @@ CPU所生成的地址称为：虚拟地址（或逻辑地址），而内存单�
 
 分页是将物理内存分为固定大小的快，称为帧(frame)；而将虚拟内存分为同样大小的块，称为页(page)。
 
-
-
 内存管理单元（MMU）管理着地址空间和物理内存的转换，其中的页表（Page table）存储着页（程序地址空间）和页框（物理内存空间）的映射表。
 
 由CPU生成的**虚拟地址**=**页号**+**页偏移**
@@ -593,8 +629,8 @@ gcc -o hello hello.c
 ![compling.jpg](https://github.com/Realee007/jobbook/blob/master/src/image/compling.jpg?raw=true) 
 
 - 预处理阶段：处理以 # 开头的预处理命令；
-- 编译阶段：翻译成汇编文件；
-- 汇编阶段：将汇编文件翻译成可重定向目标文件；
+- 编译阶段：翻译成汇编文件；(词法分析、语法分析、语义分析及优化而生成相应的汇编代码文件)
+- 汇编阶段：通过**汇编器**将汇编文件翻译成可重定向目标文件(Object file)；
 - 链接阶段：将可重定向目标文件和 printf.o 等单独预编译好的目标文件进行合并，得到最终的可执行目标文件。
 
 ## 静态链接

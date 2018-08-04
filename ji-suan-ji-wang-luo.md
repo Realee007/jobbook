@@ -83,9 +83,20 @@ TCP/IP协议族的特点是：上下两头大而中间小。这种很像**沙漏
 与 IP 协议配套使用的还有三个协议：
 
 - 地址解析协议 ARP（Address Resolution Protocol）
+
 - 网际控制报文协议 ICMP（Internet Control Message Protocol）
+
 - 网际组管理协议 IGMP（Internet Group Management Protocol）
-- 
+
+  ![IP_and other.png](https://github.com/Realee007/jobbook/blob/master/src/image/IP_and%20other.png?raw=true) 
+
+使用 IP 协议，以把异构的物理网络连接起来，使得在网络层看起来好像是一个统一的网络。
+
+如下图，源主机H1把一个IP数据报发送给目的主机H2，其中不经过任何路由器为直接交付。在R1到R4之间的三个网络可以是任意类型的网络。
+
+
+
+
 
 ## 四. 运输层
 

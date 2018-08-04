@@ -18,13 +18,9 @@
 
 3. 虚拟
 
-   
-
 4. 异步
 
    
-
-
 
 # 基本功能
 
@@ -486,7 +482,7 @@ monitor dp
 
 C++封装线程池
 
-https://blog.csdn.net/gavingreenson/article/details/72770818
+[C++封装线程池参考](https://blog.csdn.net/gavingreenson/article/details/72770818)
 
 对象池用来通常用来避免重复的内存分配和销毁及内存碎片的产生.
 
@@ -497,7 +493,7 @@ https://blog.csdn.net/gavingreenson/article/details/72770818
 3. 堆内存的分配有可能造成内存碎片时
 4. 每个对象有封装一些自己的资源类似数据库或网络连接，很难获取及复用
 
-https://blog.csdn.net/l773575310/article/details/71601460(unity3d 飞机子弹模型)
+[unity3d 飞机子弹模型 使用线程池](https://blog.csdn.net/l773575310/article/details/71601460)
 
 
 

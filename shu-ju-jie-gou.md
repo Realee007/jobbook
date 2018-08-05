@@ -151,6 +151,7 @@ min-heap:每个节点的键值都小于或等于其子节点键值。
 
 
 
+
 - 所有**叶节点**的深度统一相等。但B树中定义了一种外部节点（即叶节点中数值为空且并不存在的孩子）
 
 		如下图，4阶B树，高度为3，其中每个节点包含1~3个关键码，拥有2~4个分支。
@@ -252,3 +253,92 @@ B+树是B-树的一种变形。有着比B-树更高的性能。
 
 删除：如果删除点A只有一个子节点，就直接把A的子节点连至A的父节点；如果A有两个子节点，我们就以右子树内最小节点取代A。
 
+
+
+# 动态规划
+
+dynamic programming ,
+
+颠倒计算方向：由自顶而下递归，为自底而上的迭代。
+
+
+
+## fibonacci算法
+
+最简单的例子是 斐波那契算法。
+
+fib()，先根据fib(0)和fib(1)计算出fib(2)，然后保留fib(1)和fib(2)计算之后的fib(3)......依次迭代至fin(n)。 
+
+```c++
+int fib(int n)
+{
+    f = 0; g = 1;	//fib(0),fib(1)
+    while(0<n--)
+    {
+        g = g+f;
+        f = g-f;
+    }
+    return g;
+}
+```
+
+此时空间复杂度：O(1)，时间复杂度：O(n)
+
+​                                                 
+
+## 最长公共子序列
+
+最长公共子序列 LCS（longest common subsequence）: 两个序列公共子序列中的最长者。子序列：由序列中若干字符，按原相对次序构成。
+
+比如 字符串"educational" 与"advantage"=>最长公共子串：data或dana
+
+<img src="https://github.com/Realee007/jobbook/blob/master/src/image/LCS-1.png" style="zoom:50%" />
+
+```c++
+//return LCS for a[0,n] and b[0,m].
+int LCSUtil(string a, string b, int n, int m)
+{
+	if (n < 0 || m < 0)		//递归基
+		return 0;
+	if (a[n] == b[m])
+	{
+		return 1+LCSUtil(a, b, n-1, m-1);		//减而治之
+	}
+	else
+	{
+		//分而治之 沿两个方向求解取更长者
+ 		return std::max(LCSUtil(a, b, n-1, m),LCSUtil(a, b, n, m-1));
+	}
+}
+int LCS(string a, string b)
+{
+	int n = a.size() - 1;
+	int m = b.size() - 1;
+	return LCSUtil(a, b, n, m);
+}
+```
+
+![LCS-2.png](https://github.com/Realee007/jobbook/blob/master/src/image/LCS-2.png?raw=true) 
+
+![lcs-3.png](https://github.com/Realee007/jobbook/blob/master/src/image/lcs-3.png?raw=true) 
+
+但是该算法的时间复杂度，最坏为O(2^n)...指数坑...
+
+- 为跳出指数时间复杂度的坑，应将递归转为为迭代。
+
+  与fib()类似，这里也有大量的重复递归子问题，各子问题分别对应A和B的某个前缀组合。总共n*m种。
+
+- 采用动态规划的策略
+
+  只需要O(n*m)时间即可计算出所有子问题。
+
+  1. 将所有子问题（假想）列为一张表。
+  2. 颠倒计算方向从`LCS(a[0],b[0])`出发，**依次**计算所有项。 
+
+![LCS-4.png](https://github.com/Realee007/jobbook/blob/master/src/image/LCS-4.png?raw=true) 
+
+ 
+
+递归：设计出可行且正确的解。
+
+动态规划：消除重复计算，提高效率。 

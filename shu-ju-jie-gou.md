@@ -152,6 +152,8 @@ min-heap:每个节点的键值都小于或等于其子节点键值。
 
 
 
+
+
 - 所有**叶节点**的深度统一相等。但B树中定义了一种外部节点（即叶节点中数值为空且并不存在的孩子）
 
 		如下图，4阶B树，高度为3，其中每个节点包含1~3个关键码，拥有2~4个分支。
@@ -292,7 +294,7 @@ int fib(int n)
 
 比如 字符串"educational" 与"advantage"=>最长公共子串：data或dana
 
-<img src="https://github.com/Realee007/jobbook/blob/master/src/image/LCS-1.png" style="zoom:50%" />
+![LCS-1.png](https://github.com/Realee007/jobbook/blob/master/src/image/LCS-1.png?raw=true) 
 
 ```c++
 //return LCS for a[0,n] and b[0,m].
@@ -318,9 +320,7 @@ int LCS(string a, string b)
 }
 ```
 
-![LCS-2.png](https://github.com/Realee007/jobbook/blob/master/src/image/LCS-2.png?raw=true) 
 
-![lcs-3.png](https://github.com/Realee007/jobbook/blob/master/src/image/lcs-3.png?raw=true) 
 
 但是该算法的时间复杂度，最坏为O(2^n)...指数坑...
 
@@ -335,9 +335,38 @@ int LCS(string a, string b)
   1. 将所有子问题（假想）列为一张表。
   2. 颠倒计算方向从`LCS(a[0],b[0])`出发，**依次**计算所有项。 
 
-![LCS-4.png](https://github.com/Realee007/jobbook/blob/master/src/image/LCS-4.png?raw=true) 
 
- 
+
+![lcs-3.png](https://github.com/Realee007/jobbook/blob/master/src/image/lcs-3.png?raw=true)
+
+```c++
+int LCSdp(string a, string b)
+{
+// 	string a = "advantage";
+// 	string b = "educational";
+	int rows = a.size();
+	int cols = b.size();
+	vector<vector<int> > result (rows+1,vector<int>(cols+1,0));	//行 列为0
+
+	for (int i = 1; i <= rows; ++i)
+	{
+		for (int j = 1; j <= cols; ++j)
+		{
+			int pre = max(result[i][j-1],result[i-1][j]);	//根据已知左邻、上邻
+
+			if (a[i-1] == b[j-1])			//如果相等则看对角线的值
+			{
+				result[i][j] =result[i - 1][j - 1] + 1;
+			}
+			else
+			{
+				result[i][j]= pre;
+			}
+		}
+	}
+	return result[rows][cols];
+} 
+```
 
 递归：设计出可行且正确的解。
 

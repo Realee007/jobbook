@@ -154,6 +154,7 @@ min-heap:每个节点的键值都小于或等于其子节点键值。
 
 
 
+
 - 所有**叶节点**的深度统一相等。但B树中定义了一种外部节点（即叶节点中数值为空且并不存在的孩子）
 
 		如下图，4阶B树，高度为3，其中每个节点包含1~3个关键码，拥有2~4个分支。
@@ -371,3 +372,120 @@ int LCSdp(string a, string b)
 递归：设计出可行且正确的解。
 
 动态规划：消除重复计算，提高效率。 
+
+
+
+## 编辑距离leetcode72
+
+题目：给定两个字符串a,b，计算出a转换成b的最少操作数，编辑距离指的最少操作次数 。
+
+转换的操作由三种：
+
+1. 插入一个字符
+2. 删除一个字符
+3. 替换一个字符
+
+```c++
+输入: word1 = "horse", word2 = "ros"
+输出: 3
+解释: 
+horse -> rorse (将 'h' 替换为 'r')
+rorse -> rose (删除 'r')
+rose -> ros (删除 'e')
+```
+
+**思路**： 分治思想，将复杂问题分解为相似的子问题。
+
+假设字符串a,共m位,假如从1开始,即a[1,m]， 字符串b共 n 位, 即b[1,n]。
+
+`d[i][j]`表示`a[1,j]`转换为`b[1,i]`的编辑距离。
+
+那么有如下递归规律：()
+
+1. 递归边界，
+   1. 当`d[i][0]`时，a[1,0]即a为空时,所以编辑距离为 **i** 。
+   2. 当`d[0][j]`时，b[1,0]即b为空时,所以编辑距离为 **j**。
+2. 一般情况
+   1. 当`a[i] = b[j]` 时，编辑距离`d[i][j]` = `d[i-1][j-1]`. 比如 a=fxy,b=fzy的编辑距离等于a=fx， b=fz。
+   2. 当`a[i]!=b[j] `时，`d[i][j]`有三种转换操作可以选择，然后取最小值:
+      1. 插入一个字符,此时 `d[i][j]` = `d[i][j-1]`+1。比如a=fxy,b=fzy的编辑距离等于fxy,fz的编辑距离 +1 .
+      2. 删除一个字符,此时`d[i][j]` = `d[i-1][j]`+1。比如a = fxy,b=fzy的编辑距离等于a=fxyb,b=fzy的编辑距离+1.
+      3. 替换一个字符,此时`d[i][j]` = `d[i-1][j-1]`+1.比如 a= fxy，b=fzy的编辑距离等于 fxy,fzy此时fx->fz的编辑距离+1（替换x为z）。
+
+```c++
+//按照上述,思路
+int recursive(string a, int pos1,string b ,int pos2)
+{
+    if(pos1==0)
+        return pos2;
+    else if(pos2==0)
+        return pos1;
+    else if(a[pos1-1]==b[pos2-1])
+        return recursive(a,pos1-1,b,pos2-1);
+    else
+    {
+        return min(recursive(a,pos1-1,b,pos2),
+                   min(recursive(a,pos1,b,pos2-1),recursive(a,pos1-1,b,pos2-1))
+                  )+1;
+    }    
+}
+int minDistance(string a, string b)
+{
+	return recursive(a,a.size(),b,b.size());
+}
+```
+
+但是有个严重的问题，就是代码的性能很低下，时间复杂度是**指数**增长的.
+
+上面的代码中，很多相同的子问题其实是经过了多次求解，解决这类问题的办法是用动态规划。
+
+以字符串 a= "horse",b="ros"为例。
+
+1. 首先建立一个矩阵，用来存放子问题和原问题的编辑距离，并将递归边界在矩阵中填好。
+
+   ![1533564271469](F:\onedrive_Hust\OneDrive - hust.edu.cn\文档\markdown\gitbook\jobbook\src\image\dp-mindistance-1.png)
+
+2. 然后计算 i = 1, j = 1 所对应的编辑距离：比较 `a[i]` 和 `b[j]` 是否相等然后根据递归规律算出这个值 .
+
+   
+
+```c++
+int minDistance(string word1, string word2) {
+        
+        int cols = word1.size();
+        int rows = word2.size();
+        vector<vector<int> > dpGrid (rows+1,vector<int>(cols+1,0));
+        for(int i =0;i<=cols;++i)
+        {
+            dpGrid[0][i] = i;
+        }
+        for(int j =0;j<=rows;++j)
+        {
+            dpGrid[j][0] = j;
+        }
+        for(int i =1;i<=rows;++i)
+        {
+            for(int j = 1;j<=cols;++j)
+            {
+                if(word1[j-1]==word2[i-1])
+                    dpGrid[i][j] = dpGrid[i-1][j-1];
+                else
+                {
+                    dpGrid[i][j] = std::min(dpGrid[i-1][j],
+                                            std::min(dpGrid[i-1][j-1],dpGrid[i][j-1]))+1;
+                }
+            }
+        }
+        return dpGrid[rows][cols];
+    }
+```
+
+现在的时间复杂度已到了可接受范围，为 O(mn)。 
+
+但是这个算法的空间复杂度为 O(mn)。是否可以再优化？
+
+**根据具体问题优化空间复杂度**：
+
+进一步分析，我们知道当计算橙色区域时，我们只需要蓝色这3块区域的值。同理，我们在计算当前行的时候，只需知道上一行即可。
+
+优化过后时间复杂度还是 O(mn), 空间复杂度降低了，上述为 O(n) 。

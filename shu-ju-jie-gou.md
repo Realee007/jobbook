@@ -443,11 +443,9 @@ int minDistance(string a, string b)
 
 1. 首先建立一个矩阵，用来存放子问题和原问题的编辑距离，并将递归边界在矩阵中填好。
 
-   ![1533564271469](F:\onedrive_Hust\OneDrive - hust.edu.cn\文档\markdown\gitbook\jobbook\src\image\dp-mindistance-1.png)
+   ![dp-mindistance-1.png](https://github.com/Realee007/jobbook/blob/master/src/image/dp-mindistance-1.png?raw=true) 
 
-2. 然后计算 i = 1, j = 1 所对应的编辑距离：比较 `a[i]` 和 `b[j]` 是否相等然后根据递归规律算出这个值 .
-
-   
+2. 然后计算 i = 1, j = 1 所对应的编辑距离：比较 `a[i]` 和 `b[j]` 是否相等然后根据递归规律算出这个值 .![dp_mindistance-2.png](https://github.com/Realee007/jobbook/blob/master/src/image/dp_mindistance-2.png?raw=true) 
 
 ```c++
 int minDistance(string word1, string word2) {
@@ -488,4 +486,6 @@ int minDistance(string word1, string word2) {
 
 进一步分析，我们知道当计算橙色区域时，我们只需要蓝色这3块区域的值。同理，我们在计算当前行的时候，只需知道上一行即可。
 
-优化过后时间复杂度还是 O(mn), 空间复杂度降低了，上述为 O(n) 。
+![dp-mindistance-3.png](https://github.com/Realee007/jobbook/blob/master/src/image/dp-mindistance-3.png?raw=true) 
+
+优化过后空间复杂度降低了，上述为 O(n) 。 时间复杂度还是 O(mn)。

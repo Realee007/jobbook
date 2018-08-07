@@ -155,6 +155,7 @@ min-heap:每个节点的键值都小于或等于其子节点键值。
 
 
 
+
 - 所有**叶节点**的深度统一相等。但B树中定义了一种外部节点（即叶节点中数值为空且并不存在的孩子）
 
 		如下图，4阶B树，高度为3，其中每个节点包含1~3个关键码，拥有2~4个分支。
@@ -375,7 +376,7 @@ int LCSdp(string a, string b)
 
 
 
-## 编辑距离leetcode72
+## 编辑距离 leetcode72
 
 题目：给定两个字符串a,b，计算出a转换成b的最少操作数，编辑距离指的最少操作次数 。
 
@@ -489,3 +490,83 @@ int minDistance(string word1, string word2) {
 ![dp-mindistance-3.png](https://github.com/Realee007/jobbook/blob/master/src/image/dp-mindistance-3.png?raw=true) 
 
 优化过后空间复杂度降低了，上述为 O(n) 。 时间复杂度还是 O(mn)。
+
+
+
+# 哈希表
+
+## 和为K的子数组 leetcode560
+
+给定一个整数数组和一个整数 **k，**你需要找到该数组中和为 **k** 的连续的子数组的个数。 
+
+```c++
+输入:nums = [1,1,1], k = 2
+输出: 2 , [1,1] 与 [1,1] 为两种不同的情况。
+```
+
+**思路：**
+
+1. 暴力法（超时）
+
+   可以列举出nums集合的对于每个index为起点的子集。然后计算sum=k的数目。
+
+   时间复杂度：O(n^3)
+
+   ```c++
+   for(int start =0;start<nums.size();++start)
+   {
+       for(int end =start+1;end<=nums.size();++end)
+       {
+           int sum=0;
+           for(int i =start;i<end;++i)
+           {
+               sum+=nums[i]
+           }
+           if(sum==k)
+               count++;
+       }
+   }
+   return count;
+   ```
+
+2. 累加式(AC)
+
+   创建辅助数组sums存储原数据的每项和，如`nums={ 3,4,7,2,-3,1,4,2}`则`sums={0,3,7,14,16,13,14,18,20}`（第一项sum为0），然后根据sum[i]-sum[j] =k判断。
+
+   时间复杂度:O(n^2)
+
+   ```c++
+   for(int start =0;start<nums.size();++start)
+   {
+       for(int end = start+1;end<=nums.size();++end)
+       {
+           if(sums[end]-sums[start]==k)
+               count++;
+       }
+   }
+   return count;
+   ```
+
+3. **hashmap**(AC)
+
+   根据连续子数组的特点，和方法2。如果在获得sums[i]时，在已知的`sums[0,i-1]`中存在`sum[j] =sum[i]-k.(0<=j<=i-1)`,则count数加1。 于是在已知的容器中，使用hashmap的查找速度最快是O(1)。
+
+   时间复杂度:O(n)
+
+   ```c++
+   hashmap.insert(make_pair(0,1));		//必须先存入(0,1)
+   int sum =0;
+   for(int i =0;i<nums.size();++i)
+   {
+       sum+=nums[i];
+       if(hashmap.count(sum-k))		//count返回unordered_map中指定键对应的元素个数
+           count+=hashmap[sum-k];
+       hashmap[sum-k]++;
+   }
+   return count;
+   ```
+
+   
+
+
+

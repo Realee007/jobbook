@@ -342,9 +342,41 @@ MyClass * p=new MyClass;
 #### new 和 malloc区别
 
 1. malloc 函数返回的是 void * 类型。对于C++，如果你写成：p = malloc (sizeof(int)); 则程序无法通过编译，报错：“不能将 void* 赋值给 int * 类型变量”。所以必须通过 (int *) 来将强制转换。而对于C，没有这个要求，但为了使C程序更方便的移植到C++中来，建议养成强制转换的习惯.
+
 2. malloc函数的实参为 sizeof(int) ，用于指明一个整型数据需要的大小.
-3. new内存分配失败时，会抛出bac_alloc异常。malloc分配内存失败时返回NULL.
+
+   - 陷阱1.  `malloc(0)`
+
+     ```c++
+     //面试题(2018.8.10银联)
+     char *ptr;
+     if((ptr = (char *)malloc(0))==NULL)
+         puts("Got a null pointer");
+     else
+         puts("Got a valid pointer");
+     ```
+
+     根据查阅资料[malloc(0)](https://stackoverflow.com/questions/2022335/whats-the-point-in-malloc0)，表示当malloc(0)时，malloc()返回NULL或者一个唯一的待释放的指针。相比此处代码却是判断maclloc返回是NULL或者是非NULL的合法指针，是有误的。 因此输出应该是不确定的。尽管我用vs多次编译运行输出的为"Got a valid pointer" 。所以面试的时候需要质疑。
+
+   - 更离谱的陷阱`malloc(-1)`
+
+     ```c++
+     char *p =(char*)malloc(-1);
+     ```
+
+     参考[malloc(负数)](https://stackoverflow.com/questions/17925771/what-happens-when-we-call-malloc-with-negative-parameter) ，因为malloc()的参数为size_t类型，无符号数，当填入负数会被强制转化为它对应的size_t的对应值。经过测试当这个数大于malloc()所能分配的上限时，会返回NULL。
+
+     ```c++
+     char *p = (char*)malloc(-1); 
+     =>
+     size_t t= (size_t)-1;  		//t=4294967295 (vs2013 win32)
+     char * p = (char*)malloc(t);
+     ```
+
+3. new内存分配失败时，会抛出`std::bad_alloc`异常。malloc分配内存失败时返回NULL。
+
 4. C++允许重载new/delete操作符.
+
 5. 内存的释放所不同,delete和free
 
 ### placement new是new的重载版
@@ -1372,8 +1404,6 @@ STL中，hashtable是以开链法，具体是在一个较大的Buckets vecotr（
 hash_map中直接地址用hash函数生成，解决冲突，用比较函数解决。 
 
 ### 迭代器失效、解决办法 
-
-
 
 
 

@@ -183,6 +183,18 @@ Qt插件本身是动态库，除此之外，它定义了一组专用的接口，
    2. 当pk都包含于Cii，则维护Cii不变，如果存在pk不包含于Cii则，再次修改Cii，且通过pk和pi+1.再依次对点集{p1,p2,......,pi-1}进行逐个扫描。直到满足。
        算法由两层递归调用，三层循环完成。![mincircle1.png](https://github.com/Realee007/jobbook/blob/master/src/image/mincircle1.png?raw=true) 
 
+
+
+改进算法：
+
+1. 最远点优先渐进：由p1,p2,p3确定最小包围圆圆心后，在点集中查询距离圆心C最远的点v，若v在C内则终止。
+
+
+
+https://people.inf.ethz.ch/gaertner/subdir/software/miniball.html
+
+
+
   ## MVC
 
 

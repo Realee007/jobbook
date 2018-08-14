@@ -378,4 +378,42 @@ HTTPS和HTTP的区别主要如下：
 
 ![socket-1.png](https://github.com/Realee007/jobbook/blob/master/src/image/socket-1.png?raw=true) 
 
-http://c.biancheng.net/cpp/html/3030.html
+ 
+
+对于服务端：
+
+1. 创建套接字
+
+    `int serv_sock = socket(domain,type,protocol);`
+
+   domain: 使用何种的地址类型 ：ipv4或ipv6，AF_INET(ipv4 protocol)、AF_INET6(ipv6 protocol).
+
+   type: 设置通信的协议类型 ：数据流或数据报，SOCK_STREAM(TCP), SOCK_DGRAM(UDP)等.
+
+   protocol: IP协议值， IPPROTO_TCP、IPPROTO_UDP 、IPPROTO_ICMP等
+
+2. 将套接字与IP、端口绑定
+
+   `bind(int serv_sock, const struct sockaddr* addr, socklen_t addrlen);`
+
+3. 进入监听状态，等待用户发起请求.`listen(int serv_sock, int backlog)`
+
+   服务器处于被动模式，backlog是连接请求队列的最大长度（当系统还没调用`accept()`时，能够等待多个连接的最大数值）。
+
+4. 接收客户端请求， `int cli_sock = accept(int serv_sock, struct sockaddr *addr,socklen_t *addrlen);`
+
+   accept函数接收客服端的地址和地址长度，成功后返回与客户端建立连接的socket描述符，注意这跟监听socket不同， 
+
+5. 向客户端发送数据 `write()`
+
+6. 关闭套接字`close()`
+
+对于客户端：
+
+1. 创建套接字 `int cli_sock = socket(AF_INET,SOCK_STREAM,0)`;
+
+2. 向服务器（特定的IP、端口）发起请求 `connect(cli_sock,serv_addr,sizeof(serv_addr));`
+
+   第一个参数是客户端的socket描述符 ，后面为服务端的地址和长度。
+
+3. 读取数据`read()`

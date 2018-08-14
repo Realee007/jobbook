@@ -376,7 +376,7 @@ HTTPS和HTTP的区别主要如下：
 
 # socket 编程
 
-![socket-1.png](https://github.com/Realee007/jobbook/blob/master/src/image/socket-1.png?raw=true) 
+![socket.png](https://github.com/Realee007/jobbook/blob/master/src/image/socket.png?raw=true) 
 
  
 
@@ -417,3 +417,154 @@ HTTPS和HTTP的区别主要如下：
    第一个参数是客户端的socket描述符 ，后面为服务端的地址和长度。
 
 3. 读取数据`read()`
+
+
+
+```c++
+server.cpp
+#include <iostream>
+#include <winsock.h>
+
+/*
+Windows下的socket程序和Linux思路相同，细节处区别如下：
+
+（1）Windows下的socket程序依赖Winsock.dll或ws2_32.dll，必须提前加载。DLL有两种加载方式。
+
+（2）Linux使用“文件描述符”的概念，而Windows使用“文件句柄”的概念；Linux不区分socket文件和普通文件，而Windows区分；Linux下socket()函数的返回值为int类型，而Windows下为SOCKET类型，也就是句柄。
+
+（3）Linux下使用read()/write()函数读写，而Windows下使用recv()/send()函数发送和接收
+
+（4）关闭socket时，Linux使用close()函数，而Windows使用closesocket()函数。
+
+*/
+
+#pragma comment(lib,"ws2_32.lib")		//Winsock Library file ws2_32.lib
+int main(int argc,char** argv)
+{
+	//初始化WSA 
+	//加载Winsock库：
+	WORD sockVersion = MAKEWORD(2, 2);
+	WSADATA wsaData;
+	if (WSAStartup(sockVersion,&wsaData)!=0)
+	{
+		return 0;
+	}
+	//创建套接字
+	SOCKET ser_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);		//TCP连接
+	//SOCKET ser_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);		//UDP连接
+
+	if (ser_sock == INVALID_SOCKET)
+	{
+		std::cout << "socket error!";
+		return 0;
+	}
+	//绑定IP和端口号
+	sockaddr_in serv_addr;
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(8888);
+	serv_addr.sin_addr.S_un.S_addr = INADDR_ANY; //INADDR_ANY就是指定地址为0.0.0.0的地址，这个地址事实上表示不确定地址，或“所有地址”、“任意地址”。 一般来说，在各个系统中均定义成为0值。
+
+	if (bind(ser_sock,(LPSOCKADDR)&serv_addr,sizeof(serv_addr))	== SOCKET_ERROR)
+	{
+		std::cout << "bind error";
+	}
+	//开始监听
+	if (listen(ser_sock,5) == SOCKET_ERROR)
+	{
+		std::cout << "listen 错误!";
+		return 0;
+	}
+	//循环接收数据
+	SOCKET cli_sock;
+	sockaddr_in cli_addr;
+	int cli_addrlen = sizeof(cli_addr);
+	char revData[255];
+	while (true)
+	{
+		std::cout << "等待连接...\n";		//服务端：等待客户端接入
+		cli_sock = accept(ser_sock, (SOCKADDR*)&cli_addr, &cli_addrlen);
+		if (cli_sock == INVALID_SOCKET)
+		{
+			std::cout << "accept 错误!";
+			continue;
+		}
+		std::cout << "接收到一个连接" << inet_ntoa(cli_addr.sin_addr)<<"\n";
+
+		//接收数据
+		int ret = recv(cli_sock, revData, 255, 0);
+		if (ret>0)
+		{
+			revData[ret] = 0x00;
+			std::cout << "接收到数据：\n";
+			std::cout << revData<<"\n";
+		}
+		//发送数据
+		const char* sendData = "你好哦，TCP客户端！\n";
+		send(cli_sock, sendData, strlen(sendData), 0);
+		closesocket(cli_sock);
+	}
+	closesocket(ser_sock);
+	WSACleanup();		//释放winsock库
+	return 0;
+}
+```
+
+
+
+```c++
+client.cpp
+#include <WinSock2.h>
+#include <iostream>
+#include <string>
+
+#pragma comment(lib,"ws2_32.lib")
+int main()
+{
+	WORD sockVersion = MAKEWORD(2, 2);
+	WSADATA data;
+	if (WSAStartup(sockVersion, &data) != 0)
+	{
+		return 0;
+	}
+	while (true)
+	{
+		SOCKET cli_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);		//TCP连接
+		if (cli_socket == INVALID_SOCKET)
+		{
+			std::cout << "错误 socket!";
+			return 0;
+		}
+		sockaddr_in serAddr;
+		serAddr.sin_family = AF_INET;
+		serAddr.sin_port = htons(8888);
+		serAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+		//客户端：请求与服务端连接
+		if (connect(cli_socket,(sockaddr*)&serAddr,sizeof(serAddr)) == SOCKET_ERROR)
+		{
+			//连接失败
+			std::cout << "连接失败";
+			closesocket(cli_socket);
+			return 0;
+		}
+
+		std::string data;
+		std::cin >> data;
+		const char* sendData;
+		sendData = data.c_str();
+
+		send(cli_socket, sendData, strlen(sendData), 0);
+
+		char recData[255];
+		int ret = recv(cli_socket, recData, 255, 0);
+		if (ret > 0)
+		{
+			recData[ret] = 0x00;
+			std::cout << recData;
+		}
+		closesocket(cli_socket);
+	}
+	WSACleanup();
+	return  0;
+}
+```
+

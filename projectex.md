@@ -119,7 +119,7 @@ XML 文档中的元素形成了一棵文档树。这棵树从根部开始，并�
 
 
 
-### 单例程序
+### 程序单一化
 
 **采用文件锁机制实现程序单实例运行**：   
 最简单自然的想法，在程序初始化的过程中检查并创建一个空的lock文件，程序结束时再删除。通过判断lock文件是否存在的方式来判断程序是否已经运行。
@@ -196,6 +196,18 @@ https://people.inf.ethz.ch/gaertner/subdir/software/miniball.html
 
 
   ## MVC
+
+
+
+
+
+## OpenGL
+
+由于客户机硬件配置，使用的opengl3.1之前的版本。
+
+旧版本的opengl 使用了如`glMatrixMode()`，来选择当前操作的矩阵为“模型视图矩阵”或"投影矩阵"
+
+`glMatrixMode(GL_MODELVIEW),glMatrixMode(GL_PROJECTION)` 并在后续使用`glTranslatef`、 `glPushMatrix` 、`glOrtho`等来对矩阵实现相应操作。
 
 
 

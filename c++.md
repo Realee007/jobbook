@@ -271,8 +271,6 @@ array = p;是不可以的。因为此时的指针是一个右值，并且数组�
  }
 ```
 
-
-
 ## static变量的作用
 
 1. 初始化
@@ -334,6 +332,70 @@ cout<<(a > b ? a : b)<<endl;
 ## volatile
 
 确保编译器不会帮你对`volatile`对象进行优化，让一切判断如你预期的执行。 即**volatile关键字是在编译阶段起作用.** 
+
+## 在main函数之前/之后执行
+
+main函数是C++程序中，“用户指定”的正式启动。其实在C++调用main做了许多事情来设置环境，如初始化静态全局变量，注意在main之前，你无法完全控制静态块初始化的顺序。
+
+在main函数之前：
+
+1. static class member
+2. global variable
+
+在main函数之后:
+
+`std::atexit(func)`:
+
+​	注册func指向的函数，在正常程序终止时调用（通过`std :: exit()`或从main函数返回）。 
+
+```c++
+
+//1.static class member （main函数之前）
+bool func()
+{
+	cout << "\nbefore main \n";
+	return true;
+}
+void func2()
+{
+	cout << "\ninside main 2\n";
+}
+class BeforMain
+{
+public:
+	static bool fun;
+	static void (*funPointer)();
+	static int* p;
+protected:
+private:
+};
+
+int* BeforMain::p = nullptr;
+bool BeforMain::fun = func();
+
+void (*BeforMain::funPointer)()= func2;
+
+//2.global variable（main函数之前）
+bool b = func();
+
+//atexit (main函数之后）
+void atexit_handler_1()
+{
+	cout << "\nafter main\n";
+}
+int main()
+{
+	cout << "\ninside main \n";
+	BeforMain::funPointer();
+	std::atexit(atexit_handler_1);
+	return 0;
+}
+//before main
+//before main
+//inside main
+//inside main2
+//after main
+```
 
 ## RAII：“资源获取即初始化”
 ​	RAII是resource acquisition is initialization的缩写，意为“资源获取即初始化”。其核心是**把资源和对象的生命周期绑定，对象创建获取资源，对象销毁释放资源**。在RAII的指导下，C++把底层的资源管理问题提升到了对象生命周期管理的更高层次。 

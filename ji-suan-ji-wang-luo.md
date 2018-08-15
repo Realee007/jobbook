@@ -402,9 +402,9 @@ HTTPS和HTTP的区别主要如下：
 
 4. 接收客户端请求， `int cli_sock = accept(int serv_sock, struct sockaddr *addr,socklen_t *addrlen);`
 
-   accept函数接收客服端的地址和地址长度，成功后返回与客户端建立连接的socket描述符，注意这跟监听socket不同， 
+   accept函数接收客服端的地址和地址长度，成功后返回与客户端建立连接的socket描述符，注意这跟监听socket不同。 
 
-5. 向客户端发送数据 `write()`
+5. 向客户端收发送数据`read()` `write()`
 
 6. 关闭套接字`close()`
 
@@ -416,9 +416,9 @@ HTTPS和HTTP的区别主要如下：
 
    第一个参数是客户端的socket描述符 ，后面为服务端的地址和长度。
 
-3. 读取数据`read()`
+3. 向服务端收发数据`write(), read()`
 
-
+4. 关闭套接字`close()`
 
 ```c++
 server.cpp
@@ -534,19 +534,18 @@ int main()
 			std::cout << "错误 socket!";
 			return 0;
 		}
-		sockaddr_in serAddr;
-		serAddr.sin_family = AF_INET;
-		serAddr.sin_port = htons(8888);
-		serAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+		sockaddr_in serv_Addr;
+		serv_Addr.sin_family = AF_INET;
+		serv_Addr.sin_port = htons(8888);
+		serv_Addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 		//客户端：请求与服务端连接
-		if (connect(cli_socket,(sockaddr*)&serAddr,sizeof(serAddr)) == SOCKET_ERROR)
+		if (connect(cli_socket,(sockaddr*)&serv_Addr,sizeof(serv_Addr)) == SOCKET_ERROR)
 		{
 			//连接失败
 			std::cout << "连接失败";
 			closesocket(cli_socket);
 			return 0;
 		}
-
 		std::string data;
 		std::cin >> data;
 		const char* sendData;

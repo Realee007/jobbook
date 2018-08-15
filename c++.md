@@ -446,7 +446,7 @@ class MyClass {…};
 MyClass * p=new MyClass;
 ```
 这里的new实际上是执行如下3个过程：
-1. 调用operator new分配内存；
+1. 调用operator new分配内存；（对于数组是operator new[]） 
 2. 调用构造函数生成类对象；
 3. 返回该对象的指针。
 #### new 和 malloc区别
@@ -490,6 +490,12 @@ MyClass * p=new MyClass;
 4. C++允许重载new/delete操作符.
 
 5. 内存的释放所不同,delete和free
+
+6. 是否调用构造函数/析构函数（new和delete会调用）
+
+   1. delete操作符 
+      1. 第一步：调用对象的析构函数。
+      2. 第二步：编译器调用operator delete(或operator delete[])函数释放内存空间。
 
 ### placement new是new的重载版
 如果你想在已经分配的内存中创建一个对象，使用new是不行的。 而placement new可以。它的原型如下

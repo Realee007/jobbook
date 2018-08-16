@@ -1,8 +1,10 @@
 # SLA软件框图
 
+![SLA pro_layer.jpg](https://github.com/Realee007/jobbook/blob/master/src/image/SLA%20pro_layer.jpg?raw=true) 
 
+三层架构：
 
-
+![SLA_pro.jpg](https://github.com/Realee007/jobbook/blob/master/src/image/SLA_pro.jpg?raw=true) 
 
 # 关键技术
 

@@ -98,11 +98,26 @@ int partition(vector<int> S，int lo, int hi)
 
    3. 插入元素
 
-      
 
 ![sort algorithm.png](https://github.com/Realee007/jobbook/blob/master/src/image/sort%20algorithm.png?raw=true) 
 
 
+
+# 容器类的操作
+
+## 支持[]操作的容器
+
+vector:	随机访问迭代器,复杂度O（1）
+
+deque:(底层为vector) 同上
+
+map：双向迭代器，不过由于是关联容器，需要通过key访问alue的方法，O（h），h为红黑树的高度 
+
+unordered_map：前向迭代器，同上，平摊复杂度O（1），最差O（n），也与散列函数的好坏有关。
+
+	当通过[]访问map及unordered_map时，如果元素不存在，则新建元素放入map中。
+
+string：同vector
 
 # 高级搜索树
 
@@ -127,9 +142,9 @@ int partition(vector<int> S，int lo, int hi)
   >
   > 通常操作系统会利用这点，使缓存利用率尽可能提高。这就是为什么新电脑再使用一段时间后更顺手。
 
-  ​	效率甚至可以更高——自适应的O(logk)
+  	效率甚至可以更高——自适应的O(logk)
 
-  ​	任何连续的m次查找，都可以在O(mlogk +nlogn)时间内完成。（在达到logk之前，需要达到常规的n次操作，每次是logn。）
+  	任何连续的m次查找，都可以在O(mlogk +nlogn)时间内完成。（在达到logk之前，需要达到常规的n次操作，每次是logn。）
 
 - 仍不能保证的单次最坏情况的出现，不适用于对效率敏感的场合。
 
@@ -159,6 +174,7 @@ int partition(vector<int> S，int lo, int hi)
   $$
   (\left \lceil m/2 \right \rceil,m) 树
   $$
+
 
 
 
@@ -318,7 +334,7 @@ int fib(int n)
 
 此时空间复杂度：O(1)，时间复杂度：O(n)
 
-​                                                 
+                                                 
 
 ## 最长公共子序列
 
@@ -598,7 +614,6 @@ int minDistance(string word1, string word2) {
    return count;
    ```
 
-   
 
 
 

@@ -11,8 +11,6 @@
 3. 多功能性高度灵活的语言
 4. 可用于开发系统软件，即操作系统、编译器和数据库等
 
-
-
 ## 继承
 
 基类（父类，超类)、派生类（子类）
@@ -467,11 +465,68 @@ int main()
 
 ### 拷贝构造函数什么时候需要重写
 
+C++默认拷贝构造函数产生的问题的讨论：
+
 **默认的拷贝构造函数和赋值操作符会实现浅拷贝的功能**。如果成员变量有指针类型，则当两个指针指向同一个地址，如果其中一个析构函数删除了那个内存，则另一个指针可能不会意识到它指向的内存已经消失。
 
-**这里有个简单的规则：** 如果你需要**定义一个非空的析构函数** 或者当为**深拷贝**的时候。那么，这种情况下你也需要定义一个拷贝构造函数。
+```c++
+class Computer
+{
+private:
+	char*  brand;
+	float  price;
+public:
+	Computer(){}
+	Computer(const char* sz, float p)
+	{
+		//构造函数中为brand分配内存   
+		brand = new char[strlen(sz) + 1];
+		strcpy(brand, sz);
+	}
+	~Computer()
+	{
+		//析构函数中释放申请的内存   
+		delete[] brand;
+		cout << " Clear is over ! " << endl;
+	}
+    void print()
+	{
+		cout << "brand : " << brand << endl;
+		cout << "price : " << price << endl;
+	}
+};
 
-## placement new操作符 
+int main(void)
+{
+	Computer obj1("Dell", 7000);
+
+	if (true)
+	{
+		Computer obj2(obj1);
+		obj2.print();
+	}
+	//cOne.brand指向的动态内存此时已经被释放   
+	obj1.print();
+	return 0;
+}
+```
+
+**这里有个简单的规则：** 如果你需要**定义一个非空的析构函数** 或者当为**深拷贝**的时候。那么，这种情况下你也需要**重写**一个拷贝构造函数。
+
+```c++
+ //自定义拷贝构造函数   
+    Computer(const  Computer&  cp)   
+    {   
+    	//重新为brand开辟与cp.brand同等大小的内存空间   
+    	brand = new char[strlen(cp.brand) + 1];   
+        strcpy(brand, cp.brand);   
+        price = cp.price;           
+    }   
+```
+
+最后提一点，自定义的拷贝构造函数，最好也重载operator=运算符!
+
+## placement new操作符	 
 placement new 是重载operator new 的版本,首先了解new操作符
 ### new做了些什么
 ```
@@ -776,6 +831,35 @@ struct MyStruct2
 
 原因:1+7(对齐)+8+4+4(满足结构体的字节边界数)=24 
 
+## struct和union的区别
+
+上面介绍了struct需要内存对齐，
+
+而union的不同之处在于，它所有的元素共享同一内存单元，且分配给union的内存size 由类型最大的元素 size 来确定 。
+
+```c++
+union MyUnion
+{
+    int a;
+    double b;
+    char c;
+}
+```
+
+在32位的操作系统中，sizeof(MyUnion) = 8. 由于union是共享内存，所以在赋值时，它会以最后一个赋值为最终值。
+
+```
+MyUnion test;
+test.a = 1;
+test.b = 1.2;
+test.c = 'a';
+//这样你只能看到test.c = 'a'，而其它值已经被它覆盖，失去意义。
+```
+
+什么时候用到union呢？
+
+当元素的相关性不强时，是可以使用union，这样会节省内存size。 
+
 ## C/C++中各种变量的位置
 
 ### Memory Layout of C Programs
@@ -874,11 +958,31 @@ const int &b =2;  # 常量左值引用绑定到右值，编程通过
 
 右值值引用通常不能绑定到任何的左值，要想绑定一个左值到右值引用，通常需要std::move()将左值强制转换为右值，例如：
 
-```
+```c++
 int a;
 int &&r1 = c;             # 编译失败
 int &&r2 = std::move(a);  # 编译通过
 ```
+## ++运算符重载
+
+具体实现如下：
+
+```c++
+Myclass& operator ++()
+{
+    i = i+1;
+    return *this
+}
+Myclass& operator ++(int)
+{
+    Myclass tmp = *this;		//临时变量
+    ++(*this);				   //调用前++
+    return tmp;				   		
+}
+```
+
+由于后缀++返回的是编译器自动分配的临时变量tmp，它并不是程序中定义的可寻址变量的引用。也就是不能通过地址对其返回值tmp进行操作。即**后缀++不能作为左值**。而前缀++可以作为左值，因为它返回的是本身。
+
 ## 模板（template）
 
 ### 模板的优势

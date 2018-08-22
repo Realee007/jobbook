@@ -379,7 +379,7 @@ HTTPS和HTTP的区别主要如下：
 
 ![socket.png](https://github.com/Realee007/jobbook/blob/master/src/image/socket.png?raw=true) 
 
- 
+##  具体过程
 
 对于服务端：
 
@@ -420,6 +420,8 @@ HTTPS和HTTP的区别主要如下：
 3. 向服务端收发数据`write(), read()`
 
 4. 关闭套接字`close()`
+
+## windows版实现
 
 ```c++
 server.cpp
@@ -567,6 +569,14 @@ int main()
 	return  0;
 }
 ```
+
+## 可能出现的问题
+
+-  Time_wait状态情况下产生地址和端口占用，怎么解决？
+
+​	socket 中的SO_REUSEADDR
+
+
 
 # 从输入URL到页面加载发生了什么
 

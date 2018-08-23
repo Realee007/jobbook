@@ -266,6 +266,30 @@ Traceroute 是 ICMP 的另一个应用，用来跟踪一个分组从源点到终
 
 
 
+TIME_WAIT状态引起的问题：
+
+	如果一台处于TIME_WAIT状态下的连接相关联的主机崩溃，然后再MSL内重新启动，并且使用与主机崩溃之前处于TIME_WAIT状态的连接相同的IP地址和端口号，那么将会怎样处理呢？
+
+	在上述情况下，该连接在主机崩溃之前产生的延迟报文段会被认为属于主机重启之后的新连接，而不是之前的连接。 为了重启之前连接，解决办法：
+
+	在bind设置`SO_REUSEADDR`套接字选项。	
+
+```c++
+const int on=1;
+setsockopt(listenfd,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
+```
+
+- SO_REUSEADDR选项
+
+  它允许启动一个监听服务器并绑定其端口，即使以前建立的该端口的本地连接仍存在。
+
+  1. 启动一个监听服务器；
+  2. 连接请求到达，派生一个子进程来处理这个client；
+  3. 监听服务器终止，但子进程继续为现有连接上的client提供服务；
+  4. 重启监听服务器
+
+  默认情况下，当监听服务器在步骤(4)中通过调用socket、bind和listen重新启动时，由于它试图捆绑一个现有连接（即正由早先派生的那个子进程处理着的连接）上的端口，从而bind调用会失败。但如果该服务器在socket和bind中间调用设置了SO_REUSEADDR选项，那么bind将成功。
+
 ## TCP重传机制
 
 重传分为两种：超时重传和快速重传。 
@@ -574,7 +598,7 @@ int main()
 
 -  Time_wait状态情况下产生地址和端口占用，怎么解决？
 
-​	socket 中的SO_REUSEADDR
+		socket 中的SO_REUSEADDR
 
 
 

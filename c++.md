@@ -569,7 +569,7 @@ MyClass * p=new MyClass;
      ```c++
      char *p = (char*)malloc(-1); 
      =>
-     size_t t= (size_t)-1;  		//t=4294967295 (vs2013 win32)
+     size_t t= (size_t)-1;  		//t=4294967295 (env: vs2013 win32)
      char * p = (char*)malloc(t);
      ```
 
@@ -596,9 +596,47 @@ char *buf  = new char[sizeof(string)]; // pre-allocated buffer
 string *p = new (buf) string("hi");    // placement new
 string *q = new string("hi");          // ordinary heap allocation
 ```
-	使用new操作符分配内存需要在堆中查找足够大的剩余空间，这个操作速度是很慢的，而且有可能出现无法分配内存的异常（空间不够）。placement new就可以解决这个问题。我们构造对象都是在一个预先准备好了的内存缓冲区中进行，不需要查找内存，内存分配的时间是常数；而且不会出现在程序运行中途出现内存不足的异常。 
+	使用new操作符分配内存需要在堆中查找足够大的剩余空间，这个操作速度是很慢的，而且有可能出现无法分配内存的异常（空间不够）。
+	
+	placement new就可以解决这个问题。我们构造对象都是在一个预先准备好了的内存缓冲区中进行，不需要查找内存，内存分配的时间是常数；而且不会出现在程序运行中途出现内存不足的异常。 
 
-### 函数可重入与线程安全
+### malloc的底层实现
+
+首先介绍 brk，sbrk，mmap，munmap 。4个Unix system call。参考[man](http://man7.org/linux/man-pages/man2/mmap.2.html)
+
+```c++
+int brk(void *addr);
+void *sbrk(intptr_t increment);
+
+void *mmap(void *addr, size_t length, int prot, int flags,int fd, off_t offset);
+int munmap(void *addr, size_t length);
+```
+
+从函数上看，
+
+- `brk()`参数为一个地址，假如你知道了堆的起始地址，还有堆的大小，那么就可以根据brk()修改地址参数达到调整堆的目的。
+
+- `sbrk(1)`参数为增长量，填1的话，每次让堆往栈的方向增加 1 个字节的大小空间。
+
+- `mmap`是将文件或者其它对象映射到内存中，它是一种内存映射文件I/O方法。
+
+  `addr`为映射的首地址，如果为NULL则系统指定。 `length`为映射空间大小，但真正的大小为`(length/pagesize +1)`，根据页大小为单位对齐。`prot`为映射的权限，`flag`为映射方式。`fd`为文件描述符，`offset`文件偏移位置，一般设为0，表示从文件头开始映射。
+
+	其返回值为内存映射后返回虚拟内存的首地址。
+
+- `munmap` 是在进程地址空间中解除一个映射关系，从addr位置开始释放length个字节的内存。
+
+在malloc底层实现：
+
+- 对于小块内存申请，一般使用`sbrk()`和`brk()`，
+
+- 对于大块内存申请，使用`mmap()`，（`free()`使用`munmap`）
+
+  对于brk和mmap，默认超过128K用mmap，否则用brk。因为只有当堆顶空闲内存区大于128K，内存才真正free还给内核。
+
+[内存中的程序剖析](https://manybutfinite.com/post/anatomy-of-a-program-in-memory/)
+
+## 函数可重入与线程安全
 
 函数可重入(Reentrant)：一个函数被重入，表示这个函数没有执行完成，由于外部因素或内部调用，又一次进入该函数执行。
 
@@ -862,7 +900,7 @@ test.c = 'a';
 
 ## C/C++中各种变量的位置
 
-### Memory Layout of C Programs
+### 程序的内存分布
 
 1. 文本段
 2. 初始化数据段
@@ -968,12 +1006,12 @@ int &&r2 = std::move(a);  # 编译通过
 具体实现如下：
 
 ```c++
-Myclass& operator ++()
+Myclass& operator ++()				//返回引用
 {
     i = i+1;
     return *this
 }
-Myclass& operator ++(int)
+Myclass operator ++(int)		 //返回变量本身
 {
     Myclass tmp = *this;		//临时变量
     ++(*this);				   //调用前++
@@ -1691,5 +1729,38 @@ hash_map中直接地址用hash函数生成，解决冲突，用比较函数解�
 
 ### 迭代器失效、解决办法 
 
+## 调试器的原理
 
+### 调试的过程
+
+1. 在代码执行过程中进行中断
+
+2. 查看变量，代码，堆栈
+3. 设置断点，下一部的调试指令。
+
+中断类型有几种：
+
+1. 逐行
+2. 逐指令
+3. 断点
+
+一般为了高效，会将断点以指令的方式设定：如int 3.
+
+**中断过程**：
+
+- 中断给调试器提供了一种回调。
+- 中断时，由于要让被调试程序暂停接受调试，所以这个过程需要同步阻塞。 本地调试一般使用信号量，远程调试一般使用socket阻塞模式。暂停时，等待外部给调试指令。
+
+**调试指令：**
+
+- 调试器需要支持以下调试指令:
+- step in: 执行一条指令, 如果这个指令可以跳入, 就跳入一个层次(例如函数)  
+  - visual studio F11  (debugger step in)
+- step out:   跳出一个层次
+  - visual studio SHIFT+F11(debugger step out)
+- step over:  执行一条指令, 如果指令可跳入, 在其返回后继续
+  - visual studio F10(debugger step over)
+- continue: 继续连续执行指令, 直到碰到断点
+
+等等..具体内容很多
 

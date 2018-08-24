@@ -269,9 +269,9 @@ Traceroute 是 ICMP 的另一个应用，用来跟踪一个分组从源点到终
 TIME_WAIT状态引起的问题：
 
 	如果一台处于TIME_WAIT状态下的连接相关联的主机崩溃，然后再MSL内重新启动，并且使用与主机崩溃之前处于TIME_WAIT状态的连接相同的IP地址和端口号，那么将会怎样处理呢？
-
+	
 	在上述情况下，该连接在主机崩溃之前产生的延迟报文段会被认为属于主机重启之后的新连接，而不是之前的连接。 为了重启之前连接，解决办法：
-
+	
 	在bind设置`SO_REUSEADDR`套接字选项。	
 
 ```c++
@@ -752,3 +752,70 @@ E为了更省事，直接雇个佣人给他钓鱼，当佣人钓起鱼后，再�
 # I/O 复用
 
 select/poll/epoll 都是 I/O 多路复用的具体实现，select 出现的最早，之后是 poll，再是 epoll。
+
+## select
+
+```
+#include <sys/select.h>
+#include <sys/time.h>
+
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout) //返回值：就绪描述符的数目，超时返回0，出错返回-1
+
+void FD_ZERO(fd_set *fdset);           //清空集合
+void FD_SET(int fd, fd_set *fdset);   //将一个给定的文件描述符加入集合之中
+void FD_CLR(int fd, fd_set *fdset);   //将一个给定的文件描述符从集合中删除
+int FD_ISSET(int fd, fd_set *fdset);   // 检查集合中指定的文件描述符是否可以读写
+
+timeout告知内核等待所指定描述字中的任何一个就绪可花多少时间。其timeval结构用于指定这段时间的秒数和微秒数。
+struct timeval{
+long tv_sec;   //seconds
+long tv_usec;  //microseconds
+};
+```
+
+## poll
+
+```c++
+# include <poll.h>
+int poll ( struct pollfd * fds, unsigned int nfds, int timeout);
+```
+
+poll的机制与select类似，与select在本质上没有多大差别,poll使用pollfd结构而不是select的fd_set结构，poll和select同样存在一个缺点就是，包含大量文件描述符的数组被整体复制于用户态和内核的地址空间之间，而不论这些文件描述符是否就绪，它的开销随着文件描述符数量的增加而线性增大。
+
+
+
+## epoll
+
+epoll提供了三个函数，
+
+epoll_create是创建一个epoll句柄；
+
+epoll_ctl是注册要监听的事件类型；
+
+epoll_wait则是等待事件的产生。
+
+```c++
+#include <sys/epoll.h>
+int epoll_create(int size);
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
+```
+
+## 总结
+
+（1）select，poll实现需要自己不断轮询所有fd集合，直到设备就绪，期间可能要睡眠和唤醒多次交替。而epoll其实也需要调用epoll_wait不断轮询就绪链表，期间也可能多次睡眠和唤醒交替，但是它是设备就绪时，调用回调函数，把就绪fd放入就绪链表中，并唤醒在epoll_wait中进入睡眠的进程。虽然都要睡眠和交替，但是select和poll在“醒着”的时候要遍历整个fd集合，而epoll在“醒着”的时候只要判断一下就绪链表是否为空就行了，这节省了大量的CPU时间。这就是回调机制带来的性能提升。
+
+（2）select，poll每次调用都要把fd集合从用户态往内核态拷贝一次，并且要把current往设备等待队列中挂一次，而epoll只要一次拷贝，而且把current往等待队列上挂也只挂一次（在epoll_wait的开始，注意这里的等待队列并不是设备等待队列，只是一个epoll内部定义的等待队列）。这也能节省不少的开销。
+
+|          | select                                                       | epoll                                                        |
+| -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 性能     | 随着连接数增加，急剧下降。处理成千上万并发连接数时，性能很差。 | 随着连接数的增加，性能基本上没有下降，处理成千上万并发时，性能较好。 |
+| 连接数   | 连接数有限制，处理的最大连接数不超过1024.如果要超过1024需要修改FD_SETSIZE。 | 连接数无限制                                                 |
+| 处理机制 | 线性轮询                                                     | 回调callback                                                 |
+
+在active数量越来越多
+
+epoll的效率会接近poll。
+
+如果server经常处理大量的active而且这个数量接近所监控的socket数目的话，那么使用poll会比epoll更好。
+

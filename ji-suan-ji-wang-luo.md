@@ -671,7 +671,7 @@ UNIX系统将所有的外部设备都看作一个文件来看待。文件描述�
 
 ### 1.阻塞式I/O模型
 
-在默认情况下，所以套接字都是阻塞的。由于UDP数据准备好读取的概念相对于TCP简单，即要么整个数据报已经收到，要么还没有。所以以数据报套接字作为例子，如下图：
+在默认情况下，所有套接字都是阻塞的。由于UDP数据准备好读取的概念相对于TCP简单，即要么整个数据报已经收到，要么还没有。所以以数据报套接字作为例子，如下图：
 
 ![io-blocking io.png](https://github.com/Realee007/jobbook/blob/master/src/image/io-blocking%20io.png?raw=true)
 

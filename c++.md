@@ -634,7 +634,7 @@ int munmap(void *addr, size_t length);
 
   对于brk和mmap，默认超过128K用mmap，否则用brk。因为只有当堆顶空闲内存区大于128K，内存才真正free还给内核。
 
-[内存中的程序剖析](https://manybutfinite.com/post/anatomy-of-a-program-in-memory/)
+  具体的使用可参考:[以内存的角度剖析程序](https://manybutfinite.com/post/anatomy-of-a-program-in-memory/)
 
 ## 函数可重入与线程安全
 

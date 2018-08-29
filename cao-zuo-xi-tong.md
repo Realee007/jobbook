@@ -234,11 +234,111 @@ int pid = fork();
   2. 有限容量，如果队列未满，则非阻塞send，当容量满后，必须阻塞send，直到容量可用。
   3. 无线容量，非阻塞send。
 
+#### 消息队列(MQ)的实现
+
+UNIX下：
+
+```
+key_t ftok(const char* pathname, int proj_id);
+// 创建唯一键，成功返回唯一键标识符，失败返回-1
+// pathname:指定的文件名， proj_id:子序列号(8bit可用0-255)
+
+int msgget(key_t key, int msgflg);
+// 建立消息队列。返回其消息队列标识符
+// msgflg是不同类型的控制操作符。
+
+int msgsnd(int msgid, struct msgbuf* msgp, int msgsz, int msgflg);
+//将消息送入消息队列
+//msgid由msgget函数得到，msgp为要发送的消息结构，msgsz为发送消息的长度，msgflg为控制函数行为的标志。
+
+int msgrcv(int msgid,struct masgbuf* msgp, int msgsz, long msgtyp,int msgflg);
+//从消息队列中读取消息
+//第四个参数为指定从队列中所取消息的类型。
+```
+
+```c
+// C Program for Message Queue (Writer Process)
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+// structure for message queue
+struct mesg_buffer {
+	long mesg_type;
+	char mesg_text[100];
+} message;
+int main()
+{
+	key_t key;
+	int msgid;
+
+	// ftok to generate unique key
+	key = ftok("progfile", 65);
+
+	// msgget creates a message queue
+	// and returns identifier
+	msgid = msgget(key, 0666 | IPC_CREAT);
+	message.mesg_type = 1;					//指定msgtyp;接收函数需要指定该msgtyp
+
+	printf("Write Data : ");
+	gets(message.mesg_text);
+
+	// msgsnd to send message
+	msgsnd(msgid, &message, sizeof(message), 0);
+
+	// display the message
+	printf("Data send is : %s \n", message.mesg_text);
+
+	return 0;
+}
+
+```
+
+```c
+// C Program for Message Queue (Reader Process)
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+// structure for message queue
+struct mesg_buffer {
+	long mesg_type;
+	char mesg_text[100];
+} message;
+
+int main()
+{
+	key_t key;
+	int msgid;
+
+	// ftok to generate unique key
+	key = ftok("progfile", 65);
+
+	// msgget creates a message queue
+	// and returns identifier
+	msgid = msgget(key, 0666 | IPC_CREAT);
+
+	// msgrcv to receive message
+	msgrcv(msgid, &message, sizeof(message), 1, 0);
+
+	// display the message
+	printf("Data Received is : %s \n", 
+					message.mesg_text);
+
+	// to destroy the message queue
+	msgctl(msgid, IPC_RMID, NULL);
+
+	return 0;
+}
+
+```
+
+
+
 ### 共享内存（shared memory）
 
 共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问，共享内存是**最快的IPC方式**，它往往与其他通信机制，如信号量配合使用，来实现进程间的同步和通信。 
 
-	常见：生产者进程--消费者进程，采用共享内存（缓存）。
+常见：生产者进程--消费者进程，采用共享内存（缓存）。
 
 ### 管道（Pipes）
 

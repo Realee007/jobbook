@@ -1,8 +1,41 @@
+以Mysql数据库为基础，介绍Database。
+
+# 一、数据库的定义
+
+数据库并不就是一堆数据的集合，实际比这复杂的多。
+
+- 数据库：物理操作文件系统或其他形式文件类型的集合；
+- 实例：MySQL数据库由后台线程以及一个共享内存区组成；
 
 
 
+## 1.1 数据库和实例
+
+	在MySQL中，实例和数据库往往都是一一对应，而我们一般是无法直接操作数据库，而是通过数据库实例来操作数据库文件，可以理解为**数据库实例是数据库为上层提供的一个专门用于操作的接口**。
 
 
+
+	在UNIX上，启动一个MySQL实例往往会产生两个进程，`mysqld`就是真正的数据库服务守护进程，而`mysqld_safe` 是一个用于检查和设置`mysqld`启动的控制程序，它负责监控MySQL进程的执行，当`mysqld`发生错误时，`mysqld_safe`会对其状态进行检查并在合适的条件下重启。
+
+## 1.2 MySQL的架构
+
+- 最上层用于连接、线程处理的部分并不是MySQL发明的，很多服务都有这样类似的组成部分；		
+- 第二层中包含了大多数MySQL核心服务，包括对SQL的解析、分析、优化和缓存等，存储过程、触发器和视图都是在这实现。
+- 第三层就是MySQL中真正负责数据的存储和提取的存储引擎。 MySQL5.5之前为 MyISAM，MYSQL5.5之后为InnoDB。
+
+![Logical-View-of-MySQL-Architecture](https://raw.githubusercontent.com/Draveness/Analyze/master/contents/Database/images/mysql/Logical-View-of-MySQL-Architecture.jpg)
+
+## 1.3 数据的存储
+
+​	在InnoDB存储引擎中，所有的数据都被**逻辑地**存放在表空间(tablespace)中，表空间是存储引擎中最高的存储逻辑单元，在表空间的下面又包括段(segment)、区(extent)、页(page)：
+
+![Tablespace-segment-extent-page-row](https://raw.githubusercontent.com/Draveness/Analyze/master/contents/Database/images/mysql/Tablespace-segment-extent-page-row.jpg)
+
+​	同一个数据库实例的所有表空间都有相同的页大小；默认情况下，表空间中的页大小都为16Kb，当然也可以通过改变`innodb_page_size`选项对默认进行修改，不同页大小最终也导致区大小的不同；
+
+![Relation Between Page Size - Extent Size](https://raw.githubusercontent.com/Draveness/Analyze/master/contents/Database/images/mysql/Relation%20Between%20Page%20Size%20-%20Extent%20Size.png)
+
+​	从图中可以看出，在 InnoDB 存储引擎中，一个区(extent)的大小最小为 1MB，页(page)的数量最少为 64 个。
 
 ## 数据库的事务实现原理、操作过程、如何做到事物之间的独立性等问题 
 

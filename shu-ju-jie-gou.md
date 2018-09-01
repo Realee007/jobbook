@@ -1,3 +1,7 @@
+[TOC]
+
+
+
 # 排序算法
 
 ## 稳定排序
@@ -212,6 +216,7 @@ string：同vector
   $$
   (\left \lceil m/2 \right \rceil,m) 树
   $$
+
 
 
 

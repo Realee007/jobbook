@@ -1,5 +1,3 @@
-# 
-
 # 计算机网络
 
 # 计算机网络体系结构
@@ -800,6 +798,10 @@ int epoll_create(int size);
 int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
 int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
 ```
+
+epoll提供两种工作模式：LT 和 ET。
+
+LT模式是epoll默认的工作方式，相当于一个效率很高的poll模型；而ET是**高效**的工作方式。
 
 ## 总结
 

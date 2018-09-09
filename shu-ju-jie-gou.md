@@ -264,6 +264,8 @@ string：同vector
 
 height(v)+depth(v)<=height(root).
 
+![Tree-1.png](https://github.com/Realee007/jobbook/blob/master/src/image/Tree-1.png?raw=true) 
+
 
 
 

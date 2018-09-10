@@ -793,7 +793,7 @@ select/poll/epoll 都是 I/O 多路复用的具体实现，select 出现的最�
 
 ## select
 
-```
+```c++
 #include <sys/select.h>
 #include <sys/time.h>
 

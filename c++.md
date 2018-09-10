@@ -155,7 +155,7 @@ void printDouble(const double& rd){
 　　} 　　　 
 ```
 
-	相反，指针则应该总是被测试，防止其为空： 
+相反，指针则应该总是被测试，防止其为空： 
 
 ```c++
 void printDouble(const double *pd）
@@ -260,7 +260,7 @@ array = p;是不可以的。因为此时的指针是一个右值，并且数组�
 2. const修饰的类对象，其中的任何成员都不能被修改，所以该对象只能调用const成员函数。
 
 #### 5. 将const类型转化为非const类型
-      采用`const_cast<type_id>(expression)`
+  采用`const_cast<type_id>(expression)`
 
 ## 变量的可见性
 
@@ -433,7 +433,7 @@ int main()
 ```
 
 ## RAII：“资源获取即初始化”
-	RAII是resource acquisition is initialization的缩写，意为“资源获取即初始化”。其核心是**把资源和对象的生命周期绑定，对象创建获取资源，对象销毁释放资源**。在RAII的指导下，C++把底层的资源管理问题提升到了对象生命周期管理的更高层次。 
+RAII是resource acquisition is initialization的缩写，意为“资源获取即初始化”。其核心是**把资源和对象的生命周期绑定，对象创建获取资源，对象销毁释放资源**。在RAII的指导下，C++把底层的资源管理问题提升到了对象生命周期管理的更高层次。 
 
 ## 拷贝构造函数(copy constructor )
 

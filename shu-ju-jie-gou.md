@@ -104,6 +104,33 @@
 - 原地算法
 
 ```c++
+方法1：
+int parttion(int* vec, int lo, int hi)		//[lo,hi)
+{
+	std::swap(vec[lo], vec[rand() % (hi - lo + 1) + lo]); //随机法
+	int pivot = vec[lo];		//以首元素为候选点,由于上面的随机swap，所以为随机法
+	while (lo < hi)				//从vec的两端交替地向中间扫描
+	{
+		while (lo < hi && vec[hi] >= pivot)			//在不小于pivot的前提下
+		{
+			hi--;
+		}
+		vec[lo] = vec[hi];
+		while (lo < hi && vec[lo] <= pivot)
+		{
+			lo++;
+		}
+		vec[hi] = vec[lo];
+	}//assert:lo==hi
+	vec[lo] = pivot;
+	return lo;
+}
+```
+
+
+
+```c++
+优化方法2：
 void quickSort(vector<int>& S, int lo,int hi)
 {
     if(hi-lo<2) return ;
@@ -248,6 +275,25 @@ unordered_map：前向迭代器，同上，平摊复杂度O（1），最差O（n
 
 string：同vector
 
+# 链表
+
+```
+ListNode* reverseList(ListNode* head) 
+{
+    //iterative
+    ListNode* tmpNode = nullptr;
+    ListNode* nextNode;
+    while(head!=nullptr)
+    {
+        nextNode = head->next;
+        head->next = tmpNode;
+        tmpNode = head;
+        head = nextNode;
+    }
+    return tmpNode;
+ }
+```
+
 
 
 # 二叉树
@@ -335,6 +381,8 @@ height(v)+depth(v)<=height(root).
   $$
   (\left \lceil m/2 \right \rceil,m) 树
   $$
+
+
 
 
 
